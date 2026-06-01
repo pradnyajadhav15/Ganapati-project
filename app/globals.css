@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-cream text-ink font-body antialiased;
+  }
+  h1, h2, h3 {
+    @apply font-display tracking-tight;
+  }
+}
+
+@layer components {
+  .site-wrap {
+    @apply mx-auto max-w-site px-7;
+  }
+  .btn-primary {
+    @apply rounded-full bg-ink px-8 py-3.5 text-sm font-semibold text-cream
+           transition hover:-translate-y-0.5 hover:shadow-soft;
+  }
+  .btn-ghost {
+    @apply rounded-full border-[1.5px] border-ink px-8 py-3.5 text-sm font-semibold
+           text-ink transition hover:bg-ink hover:text-cream;
+  }
+  .kicker {
+    @apply text-[0.76rem] uppercase tracking-[0.34em] text-gold;
+  }
+}
+
+/* page-load reveal */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.reveal { animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; }

@@ -1,0 +1,42 @@
+import Link from "next/link";
+import { signIn } from "../auth/actions";
+
+export const metadata = { title: "Log In — R. Ramesh Arts Studio" };
+const field =
+  "w-full rounded-xl border border-line bg-cream px-4 py-3 outline-none focus:border-sage-deep";
+
+export default function LoginPage({
+  searchParams,
+}: {
+  searchParams: { error?: string };
+}) {
+  return (
+    <section className="grid min-h-[70vh] place-items-center px-6 py-16">
+      <form
+        action={signIn}
+        className="w-full max-w-sm rounded-xl2 border border-line bg-white p-8 shadow-soft"
+      >
+        <h1 className="text-center text-3xl">Welcome back</h1>
+        <p className="mb-6 mt-1 text-center text-sm text-ink-soft">
+          Log in to your account
+        </p>
+        <div className="space-y-4">
+          <input name="email" type="email" required placeholder="Email" className={field} />
+          <input name="password" type="password" required placeholder="Password" className={field} />
+        </div>
+        {searchParams?.error && (
+          <p className="mt-3 text-sm text-red-600">{searchParams.error}</p>
+        )}
+        <button type="submit" className="btn-primary mt-5 w-full text-center">
+          Log In
+        </button>
+        <p className="mt-5 text-center text-sm text-ink-soft">
+          New here?{" "}
+          <Link href="/signup" className="font-semibold text-sage-deep underline">
+            Create an account
+          </Link>
+        </p>
+      </form>
+    </section>
+  );
+}
