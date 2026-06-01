@@ -1,6 +1,11 @@
 import Link from "next/link";
+import { getLocale } from "@/lib/locale";
+import { getDict } from "@/lib/i18n";
 
 export default function Footer() {
+  const locale = getLocale();
+  const t = getDict(locale);
+
   return (
     <footer className="bg-sage-deep pb-7 pt-16 text-[#f3ede2]">
       <div className="site-wrap">
@@ -10,9 +15,7 @@ export default function Footer() {
               R. Ramesh Arts Studio
             </h4>
             <p className="max-w-xs text-sm opacity-85">
-              Handcrafted Ganesh idols in plaster, Shadu Mati and fiber —
-              beautifully detailed and hand-painted, made with devotion in
-              Solapur.
+              {t.footerTagline}
             </p>
             <div className="mt-4 space-y-1 text-sm opacity-85">
               <p>34/A1/26, Geeta Nagar, New Paccha Peth, Solapur, 413005</p>
@@ -25,26 +28,26 @@ export default function Footer() {
           </div>
 
           <FootCol
-            title="Quick Links"
+            title={t.quickLinks}
             items={[
-              ["About Us", "/about"],
-              ["Contact Us", "/contact"],
-              ["Initiative", "/initiative"],
-              ["Collections", "/collections/shadu-mati-idols"],
-              ["News", "/media-coverage"],
+              [t.aboutUs, "/about"],
+              [t.contactUs, "/contact"],
+              [t.initiative, "/initiative"],
+              [t.collections, "/collections/shadu-mati-idols"],
+              [t.news, "/media-coverage"],
             ]}
           />
           <FootCol
-            title="Policies"
+            title={t.policies}
             items={[
-              ["Refund Policy", "/refund-policy"],
-              ["Shipping Policy", "/shipping-policy"],
-              ["Terms of Service", "/terms"],
-              ["Privacy Policy", "/privacy"],
+              [t.refundPolicy, "/refund-policy"],
+              [t.shippingPolicy, "/shipping-policy"],
+              [t.termsOfService, "/terms"],
+              [t.privacyPolicy, "/privacy"],
             ]}
           />
           <FootCol
-            title="Follow"
+            title={t.follow}
             items={[
               ["YouTube", "https://www.youtube.com/@R.RameshArts"],
               ["Instagram", "https://www.instagram.com/_r.ramesharts_?igsh=MWFqbXdpNjN5dXFkNw=="],
@@ -54,7 +57,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-11 border-t border-white/20 pt-5 text-center text-[0.8rem] opacity-70">
-          © 2026 R. Ramesh Arts Studio · Solapur · Built with devotion.
+          {t.footerCopyright}
         </div>
       </div>
     </footer>

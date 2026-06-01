@@ -1,15 +1,20 @@
 import { supabase } from "./supabase";
+import { type Locale } from "./i18n";
 
 export type Category = "dashboard-idols" | "shadu-mati-idols" | "fiber-idols" | "pop-idols";
 
 export type Product = {
   id: string;
   name: string;
+  name_hi: string | null;
+  name_mr: string | null;
   price: number; // rupees
   category: Category;
   size: string | null;
   tag: string | null;
   description: string | null;
+  description_hi: string | null;
+  description_mr: string | null;
   image_url: string | null;
   in_stock: boolean;
   created_at?: string;
@@ -28,15 +33,27 @@ export const CATEGORY_META: Record<Category, { title: string; blurb: string }> =
     title: "Fiber Idols",
     blurb: "Lightweight, durable fiber idols for reuse and display.",
   },
-
   "pop-idols": {
     title: "Pop Idols",
     blurb: "Finely detailed plaster idols with a smooth painted finish.",
   },
 };
 
-;
 export { formatINR } from "./format";
+
+// --- Language helpers (English fallback when a translation is empty) ---
+
+export function localizedName(p: Product, locale: Locale): string {
+  if (locale === "hi") return p.name_hi || p.name;
+  if (locale === "mr") return p.name_mr || p.name;
+  return p.name;
+}
+
+export function localizedDescription(p: Product, locale: Locale): string | null {
+  if (locale === "hi") return p.description_hi || p.description;
+  if (locale === "mr") return p.description_mr || p.description;
+  return p.description;
+}
 
 export async function getProducts(): Promise<Product[]> {
   const { data, error } = await supabase

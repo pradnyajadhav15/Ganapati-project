@@ -15,8 +15,19 @@ export default function NewProductPage() {
 
       <form action={createProduct} className="max-w-xl space-y-5 rounded-xl2 border border-line bg-white p-8">
         <div>
-          <label className="mb-1 block text-sm font-medium">Name</label>
+          <label className="mb-1 block text-sm font-medium">Name (English)</label>
           <input name="name" required placeholder="Bal Ganesh" className={field} />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="mb-1 block text-sm font-medium">Name (Hindi)</label>
+            <input name="name_hi" placeholder="बाल गणेश" className={field} />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium">Name (Marathi)</label>
+            <input name="name_mr" placeholder="बाळ गणेश" className={field} />
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -46,9 +57,22 @@ export default function NewProductPage() {
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium">Description</label>
+          <label className="mb-1 block text-sm font-medium">Description (English)</label>
           <textarea name="description" rows={3} className={field} placeholder="Short description" />
         </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="mb-1 block text-sm font-medium">Description (Hindi)</label>
+            <textarea name="description_hi" rows={2} className={field} placeholder="संक्षिप्त विवरण" />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium">Description (Marathi)</label>
+            <textarea name="description_mr" rows={2} className={field} placeholder="थोडक्यात माहिती" />
+          </div>
+        </div>
+
+        <p className="text-xs text-ink-soft">Hindi & Marathi fields are optional — if left blank, the English version is shown.</p>
 
         <div>
           <label className="mb-1 block text-sm font-medium">Photo</label>

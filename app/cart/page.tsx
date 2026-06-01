@@ -3,20 +3,22 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useCart } from "@/components/CartProvider";
+import { useLocale } from "@/components/LocaleProvider";
 import { formatINR } from "@/lib/format";
 
 export default function CartPage() {
   const { items, setQty, remove, total, ready } = useCart();
+  const { t } = useLocale();
 
   if (!ready) return <section className="site-wrap py-20" />;
 
   if (!items.length) {
     return (
       <section className="site-wrap py-24 text-center">
-        <h1 className="text-3xl">Your cart is empty</h1>
-        <p className="mt-2 text-ink-soft">Add an idol to get started.</p>
+        <h1 className="text-3xl">{t.cartEmptyTitle}</h1>
+        <p className="mt-2 text-ink-soft">{t.cartEmptySub}</p>
         <Link href="/collections/shadu-mati-idols" className="btn-primary mt-6 inline-block">
-          Browse Idols
+          {t.browseIdols}
         </Link>
       </section>
     );
@@ -24,7 +26,7 @@ export default function CartPage() {
 
   return (
     <section className="site-wrap py-12">
-      <h1 className="mb-8 text-3xl">Your Cart</h1>
+      <h1 className="mb-8 text-3xl">{t.yourCart}</h1>
       <div className="grid gap-8 md:grid-cols-[1fr_320px]">
         <div className="space-y-4">
           {items.map((i) => (
@@ -49,7 +51,7 @@ export default function CartPage() {
                     <button onClick={() => setQty(i.id, i.qty + 1)} className="grid h-7 w-7 place-items-center text-lg" aria-label="increase">+</button>
                   </div>
                   <button onClick={() => remove(i.id)} className="text-xs text-ink-soft underline hover:text-red-600">
-                    Remove
+                    {t.remove}
                   </button>
                 </div>
               </div>
@@ -59,13 +61,13 @@ export default function CartPage() {
         </div>
 
         <aside className="h-fit rounded-xl2 border border-line bg-cream-deep p-6">
-          <h2 className="text-xl">Summary</h2>
+          <h2 className="text-xl">{t.summary}</h2>
           <div className="mt-4 flex justify-between border-t border-line pt-4">
-            <span>Total</span>
+            <span>{t.total}</span>
             <b className="font-display text-xl text-terracotta">{formatINR(total)}</b>
           </div>
           <Link href="/checkout" className="btn-primary mt-5 block w-full text-center">
-            Proceed to Checkout
+            {t.proceedToCheckout}
           </Link>
         </aside>
       </div>

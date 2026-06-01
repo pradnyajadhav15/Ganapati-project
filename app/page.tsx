@@ -5,6 +5,8 @@ import SectionHeading from "@/components/SectionHeading";
 import { getProducts } from "@/lib/products";
 import { formatINR } from "@/lib/format";
 import Testimonials from "@/components/Testimonials";
+import { getLocale } from "@/lib/locale";
+import { getDict, type Dict } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -18,8 +20,7 @@ const shastra = [
 
 const features = [
   {
-    h: "Fine Detailing",
-    p: "Crisp, intricate craftsmanship on every idol.",
+    hKey: "fineDetailing", pKey: "fineDetailingP",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
         <path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" />
@@ -27,8 +28,7 @@ const features = [
     ),
   },
   {
-    h: "Vibrant Finish",
-    p: "Rich, hand-painted colours that last.",
+    hKey: "vibrantFinish", pKey: "vibrantFinishP",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
         <path d="M12 3s6 6.5 6 10.5a6 6 0 0 1-12 0C6 9.5 12 3 12 3z" />
@@ -36,8 +36,7 @@ const features = [
     ),
   },
   {
-    h: "Many Materials",
-    p: "Plaster, Shadu Mati and fiber options.",
+    hKey: "manyMaterials", pKey: "manyMaterialsP",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
         <path d="M12 3 3 8l9 5 9-5z" />
@@ -46,8 +45,7 @@ const features = [
     ),
   },
   {
-    h: "Easy to Handle",
-    p: "Lightweight, sturdy and travel-friendly.",
+    hKey: "easyHandle", pKey: "easyHandleP",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
         <path d="M21 8 12 3 3 8v8l9 5 9-5z" />
@@ -56,10 +54,13 @@ const features = [
       </svg>
     ),
   },
-];
+] as const;
 
 export default async function Home() {
   const products = await getProducts();
+  const locale = getLocale();
+  const t = getDict(locale);
+
   return (
     <>
       {/* HERO */}
@@ -67,19 +68,17 @@ export default async function Home() {
         <div className="site-wrap grid w-full items-center gap-10 md:grid-cols-[1.05fr_.95fr]">
           <div className="reveal">
             <div className="mb-5 text-[0.78rem] uppercase tracking-[0.34em] text-sage-deep">
-              Handcrafted &middot; Hand-Painted &middot; Ganesh Idols
+              {t.heroKicker}
             </div>
             <h1 className="text-[clamp(2.6rem,5vw,4.4rem)] leading-[1.02]">
-              Devotion,<br />
-              sculpted in <span className="italic text-terracotta">clay</span>.
+              {t.heroTitleMain} <span className="italic text-terracotta">{t.heroTitleAccent}</span>
             </h1>
             <p className="my-6 max-w-md font-display text-[1.15rem] italic leading-relaxed text-ink-soft">
-              Beautifully detailed, hand-painted idols &mdash; crafted to bring
-              your celebration to life.
+              {t.heroSubtitle}
             </p>
             <div className="flex flex-wrap gap-3.5">
-              <Link href="/collections/shadu-mati-idols" className="btn-primary">Explore Collections</Link>
-              <Link href="/customized-work" className="btn-ghost">Book for 2026</Link>
+              <Link href="/collections/shadu-mati-idols" className="btn-primary">{t.exploreCollections}</Link>
+              <Link href="/customized-work" className="btn-ghost">{t.bookFor2026}</Link>
             </div>
           </div>
 
@@ -92,21 +91,21 @@ export default async function Home() {
 
       {/* FEATURED */}
       <section className="site-wrap py-[90px]">
-        <SectionHeading kicker="Our Collections" title="Featured Murtis" sub="Each idol is hand-sculpted and finished with rich, vibrant colours." />
+        <SectionHeading kicker={t.ourCollections} title={t.featuredMurtis} sub={t.featuredSub} />
         <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
           {products.slice(0, 4).map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
         </div>
         <div className="mt-10 text-center">
-          <Link href="/collections/shadu-mati-idols" className="btn-ghost">View All</Link>
+          <Link href="/collections/shadu-mati-idols" className="btn-ghost">{t.viewAll}</Link>
         </div>
       </section>
 
       {/* GANPATI SHASTRA */}
       <section className="bg-cream-deep py-[90px]">
         <div className="site-wrap">
-          <SectionHeading kicker="Tools & Accessories" title="Ganpati Shastra" sub="Clay tools, chakras and shastra sets to complete your idol." />
+          <SectionHeading kicker={t.toolsAccessories} title={t.ganpatiShastra} sub={t.shastraSub} />
           <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-5">
             {shastra.map((s, i) => (
               <div key={i} className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-md">
@@ -124,7 +123,7 @@ export default async function Home() {
             ))}
           </div>
           <div className="mt-10 text-center">
-            <a href="https://wa.me/917020290393" target="_blank" rel="noreferrer" className="btn-primary">Enquire on WhatsApp</a>
+            <a href="https://wa.me/917020290393" target="_blank" rel="noreferrer" className="btn-primary">{t.enquireWhatsApp}</a>
           </div>
         </div>
       </section>
@@ -133,13 +132,13 @@ export default async function Home() {
 
       {/* WHY */}
       <section className="site-wrap py-[90px]">
-        <SectionHeading kicker="Why Choose Us" title="Crafted with Care" />
+        <SectionHeading kicker={t.whyChooseUs} title={t.craftedWithCare} />
         <div className="grid grid-cols-2 gap-5 md:grid-cols-4">
           {features.map((f) => (
-            <div key={f.h} className="rounded-xl border border-line bg-white px-6 py-8 text-center">
+            <div key={f.hKey} className="rounded-xl border border-line bg-white px-6 py-8 text-center">
               <div className="mx-auto mb-4 grid h-[58px] w-[58px] place-items-center rounded-2xl bg-sage text-white">{f.icon}</div>
-              <h3 className="mb-1.5 text-[1.1rem]">{f.h}</h3>
-              <p className="text-[0.86rem] text-ink-soft">{f.p}</p>
+              <h3 className="mb-1.5 text-[1.1rem]">{t[f.hKey as keyof Dict]}</h3>
+              <p className="text-[0.86rem] text-ink-soft">{t[f.pKey as keyof Dict]}</p>
             </div>
           ))}
         </div>

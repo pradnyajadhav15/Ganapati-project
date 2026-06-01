@@ -45,11 +45,15 @@ export async function createProduct(formData: FormData) {
 
   const { error } = await supabaseAdmin.from("products").insert({
     name: formData.get("name"),
+    name_hi: formData.get("name_hi") || null,
+    name_mr: formData.get("name_mr") || null,
     price: Number(formData.get("price")),
     category: formData.get("category"),
     size: formData.get("size") || null,
     tag: formData.get("tag") || null,
     description: formData.get("description") || null,
+    description_hi: formData.get("description_hi") || null,
+    description_mr: formData.get("description_mr") || null,
     image_url,
     in_stock: true,
   });
@@ -89,11 +93,15 @@ export async function updateProduct(formData: FormData) {
 
   const updates: Record<string, unknown> = {
     name: formData.get("name"),
+    name_hi: formData.get("name_hi") || null,
+    name_mr: formData.get("name_mr") || null,
     price: Number(formData.get("price")),
     category: formData.get("category"),
     size: formData.get("size") || null,
     tag: formData.get("tag") || null,
     description: formData.get("description") || null,
+    description_hi: formData.get("description_hi") || null,
+    description_mr: formData.get("description_mr") || null,
   };
   if (hasNewImage) updates.image_url = image_url;
 

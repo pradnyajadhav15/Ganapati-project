@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProduct, formatINR, CATEGORY_META } from "@/lib/products";
+import { getProduct, formatINR, CATEGORY_META, localizedName, localizedDescription } from "@/lib/products";
+import { getLocale } from "@/lib/locale";
 
 export const dynamic = "force-dynamic";
 
@@ -13,11 +14,15 @@ export default async function ProductPage({
   const product = await getProduct(params.id);
   if (!product) notFound();
 
+  const locale = getLocale();
+  const displayName = localizedName(product, locale);
+  const displayDesc = localizedDescription(product, locale);
+
   return (
     <section className="site-wrap grid gap-10 py-16 md:grid-cols-2">
       <div className="relative aspect-square overflow-hidden rounded-xl2 bg-gradient-to-br from-peach to-rose">
         {product.image_url ? (
-          <Image src={product.image_url} alt={product.name} fill className="object-cover" />
+          <Image src={product.image_url} alt={displayName} fill className="object-cover" />
         ) : (
           <div className="grid h-full place-items-center text-[10rem]">🪔</div>
         )}
@@ -31,13 +36,13 @@ export default async function ProductPage({
           {CATEGORY_META[product.category]?.title}
         </Link>
         <h1 className="text-[clamp(2rem,4vw,3rem)]">
-          {product.name} {product.size}
+          {displayName} {product.size}
         </h1>
         <div className="my-4 font-display text-3xl text-terracotta">
           {formatINR(product.price)}
         </div>
-        {product.description && (
-          <p className="mb-6 max-w-md text-ink-soft">{product.description}</p>
+        {displayDesc && (
+          <p className="mb-6 max-w-md text-ink-soft">{displayDesc}</p>
         )}
         <div className="flex gap-3">
           <button className="btn-ghost">Add to Cart</button>

@@ -5,6 +5,8 @@ import AnnouncementBar from "@/components/AnnouncementBar";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CartProvider from "@/components/CartProvider";
+import { LocaleProvider } from "@/components/LocaleProvider";
+import { getLocale } from "@/lib/locale";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -56,14 +58,17 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = getLocale();
   return (
     <CartProvider>
-      <html lang="en" className={fraunces.variable + " " + mukta.variable}>
+      <html lang={locale} className={fraunces.variable + " " + mukta.variable}>
         <body>
-          <AnnouncementBar />
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
+          <LocaleProvider locale={locale}>
+            <AnnouncementBar />
+            <Navbar />
+            <main>{children}</main>
+            <Footer />
+          </LocaleProvider>
         </body>
       </html>
     </CartProvider>
