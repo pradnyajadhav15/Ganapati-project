@@ -105,3 +105,19 @@ export async function updateProduct(formData: FormData) {
   revalidatePath("/product/" + id);
   redirect("/admin");
 }
+
+// --- Order management ---
+
+export async function updateOrderStatus(formData: FormData) {
+  const id = formData.get("id") as string;
+  const status = formData.get("status") as string;
+
+  const { error } = await supabaseAdmin
+    .from("orders")
+    .update({ status })
+    .eq("id", id);
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin/" + id);
+  revalidatePath("/admin/orders");
+}
