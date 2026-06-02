@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { formatINR } from "@/lib/format";
+import { getLocale } from "@/lib/locale";
+import { getDict } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Order Confirmed - R. Ramesh Arts Studio" };
@@ -12,6 +14,7 @@ export default async function OrderSuccessPage({
 }) {
   const supabase = createSupabaseServerClient();
   const id = searchParams.id;
+  const t = getDict(getLocale());
 
   const { data: order } = id
     ? await supabase.from("orders").select("*").eq("id", id).single()
@@ -26,10 +29,10 @@ export default async function OrderSuccessPage({
         <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full bg-sage text-3xl">
           &#10003;
         </div>
-        <h1 className="text-3xl">Thank you!</h1>
+        <h1 className="text-3xl">{t.thankYou}</h1>
         <p className="mt-2 text-ink-soft">
-          Your order has been placed.
-          {order ? ` Order #${String(order.id).slice(0, 8)}` : ""}
+          {t.orderPlaced}
+          {order ? ` ${t.orderLabelShort}${String(order.id).slice(0, 8)}` : ""}
         </p>
 
         {items && items.length > 0 && (
@@ -44,7 +47,7 @@ export default async function OrderSuccessPage({
             ))}
             {order && (
               <div className="flex justify-between border-t border-line pt-2 font-semibold">
-                <span>Total</span>
+                <span>{t.total}</span>
                 <span>{formatINR(order.total)}</span>
               </div>
             )}
@@ -53,20 +56,20 @@ export default async function OrderSuccessPage({
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           {order?.receipt_url && (
-            <a
+            
               href={order.receipt_url as string}
               target="_blank"
               rel="noreferrer"
               className="btn-ghost"
             >
-              Download Receipt
+              {t.downloadReceipt}
             </a>
           )}
           <Link href="/account" className="btn-ghost">
-            View My Orders
+            {t.viewMyOrders}
           </Link>
           <Link href="/" className="btn-primary">
-            Continue Shopping
+            {t.continueShopping}
           </Link>
         </div>
       </div>

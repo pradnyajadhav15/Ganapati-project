@@ -1,26 +1,27 @@
 import Link from "next/link";
 import PageHero from "@/components/PageHero";
+import { getLocale } from "@/lib/locale";
+import { getDict, type Dict } from "@/lib/i18n";
 
 export const metadata = { title: "Customized Work - R. Ramesh Arts Studio" };
 
 const steps = [
-  { n: "01", h: "Share Your Vision", p: "Tell us the deity, size, pose and theme you imagine." },
-  { n: "02", h: "We Sketch & Quote", p: "Our artists share a concept and clear, transparent pricing." },
-  { n: "03", h: "Hand-Sculpted & Painted", p: "Your idol is shaped by hand and finished with rich, vibrant colours." },
-  { n: "04", h: "Delivered with Care", p: "Carefully packed and delivered in time for the festival." },
-];
+  { n: "01", hKey: "step1H", pKey: "step1P" },
+  { n: "02", hKey: "step2H", pKey: "step2P" },
+  { n: "03", hKey: "step3H", pKey: "step3P" },
+  { n: "04", hKey: "step4H", pKey: "step4P" },
+] as const;
 
 export default function Page() {
+  const t = getDict(getLocale());
+
   return (
     <>
-      <PageHero kicker="Made Just For You" title="Customized Work" swatch="from-sage to-cream-deep" />
+      <PageHero kicker={t.madeJustForYou} title={t.customizedWork} swatch="from-sage to-cream-deep" />
       <section className="site-wrap py-[80px]">
         <div className="mx-auto max-w-2xl text-center text-ink-soft">
           <p className="text-lg leading-relaxed">
-            Want a one-of-a-kind idol? We craft bespoke Ganpati murtis to your
-            exact size, pose and decoration, in plaster, Shadu Mati or fiber,
-            finished with our signature colour and fine detailing. Bulk orders
-            for mandals and societies are warmly welcome.
+            {t.customWorkIntro}
           </p>
         </div>
 
@@ -28,14 +29,14 @@ export default function Page() {
           {steps.map((s) => (
             <div key={s.n} className="rounded-xl2 border border-line bg-white p-7">
               <div className="font-display text-3xl text-terracotta">{s.n}</div>
-              <h3 className="mb-1.5 mt-3 text-[1.15rem]">{s.h}</h3>
-              <p className="text-[0.9rem] text-ink-soft">{s.p}</p>
+              <h3 className="mb-1.5 mt-3 text-[1.15rem]">{t[s.hKey as keyof Dict]}</h3>
+              <p className="text-[0.9rem] text-ink-soft">{t[s.pKey as keyof Dict]}</p>
             </div>
           ))}
         </div>
 
         <div className="mt-14 text-center">
-          <Link href="/contact" className="btn-primary">Request a Custom Idol</Link>
+          <Link href="/contact" className="btn-primary">{t.requestCustomIdol}</Link>
         </div>
       </section>
     </>

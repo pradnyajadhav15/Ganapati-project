@@ -1,25 +1,28 @@
 import SectionHeading from "@/components/SectionHeading";
+import { getLocale } from "@/lib/locale";
+import { getDict, type Dict } from "@/lib/i18n";
 
-// REPLACE these with real customer reviews before going live.
 const testimonials = [
-  { quote: "The detailing and colour work on our Ganpati was stunning. Everyone at home was amazed.", name: "Rohan Patil", city: "Pune" },
-  { quote: "Ordered a custom idol and it came out exactly as we imagined. Beautiful craftsmanship.", name: "Sneha Kulkarni", city: "Solapur" },
-  { quote: "Lovely finish and delivered well before the festival. Will order again next year.", name: "Amit Deshmukh", city: "Mumbai" },
-  { quote: "Our mandal has been buying from R. Ramesh Arts for years. Always reliable, always beautiful.", name: "Mahesh Jadhav", city: "Solapur" },
-  { quote: "Packed very safely and reached us without a scratch. Highly recommended.", name: "Priya Shah", city: "Nashik" },
-];
+  { qKey: "testi1Q", name: "Rohan Patil", cityKey: "cityPune" },
+  { qKey: "testi2Q", name: "Sneha Kulkarni", cityKey: "citySolapur" },
+  { qKey: "testi3Q", name: "Amit Deshmukh", cityKey: "cityMumbai" },
+  { qKey: "testi4Q", name: "Mahesh Jadhav", cityKey: "citySolapur" },
+  { qKey: "testi5Q", name: "Priya Shah", cityKey: "cityNashik" },
+] as const;
 
 export default function Testimonials() {
+  const t = getDict(getLocale());
+
   return (
     <section className="bg-cream-deep py-[90px]">
       <div className="site-wrap">
-        <SectionHeading kicker="Kind Words" title="What Our Customers Say" />
+        <SectionHeading kicker={t.kindWords} title={t.customerSay} />
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {testimonials.map((t, i) => (
+          {testimonials.map((r, i) => (
             <div key={i} className="rounded-xl2 border border-line bg-white p-7">
-              <p className="italic text-ink-soft">&ldquo;{t.quote}&rdquo;</p>
-              <div className="mt-4 font-display text-[1.05rem] text-ink">{t.name}</div>
-              <div className="text-xs uppercase tracking-[0.16em] text-sage-deep">{t.city}</div>
+              <p className="italic text-ink-soft">&ldquo;{t[r.qKey as keyof Dict]}&rdquo;</p>
+              <div className="mt-4 font-display text-[1.05rem] text-ink">{r.name}</div>
+              <div className="text-xs uppercase tracking-[0.16em] text-sage-deep">{t[r.cityKey as keyof Dict]}</div>
             </div>
           ))}
         </div>
