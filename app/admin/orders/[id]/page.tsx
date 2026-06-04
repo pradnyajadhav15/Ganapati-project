@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { notFound } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { formatINR } from "@/lib/format";
@@ -66,6 +66,18 @@ export default async function AdminOrderDetail({ params }: { params: { id: strin
                     <td className="p-4">{formatINR((it.price as number) * (it.qty as number))}</td>
                   </tr>
                 ))}
+                {(order.discount as number) > 0 && (
+                  <>
+                    <tr className="border-t border-line">
+                      <td colSpan={3} className="p-4 text-right text-ink-soft">Subtotal</td>
+                      <td className="p-4 text-ink-soft">{formatINR(Number(order.subtotal ?? (order.total as number) + (order.discount as number)))}</td>
+                    </tr>
+                    <tr className="border-t border-line">
+                      <td colSpan={3} className="p-4 text-right text-sage-deep">Discount {order.coupon_code ? `(${order.coupon_code})` : ""}</td>
+                      <td className="p-4 text-sage-deep">-{formatINR(order.discount as number)}</td>
+                    </tr>
+                  </>
+                )}
                 <tr className="border-t border-line bg-cream-deep">
                   <td colSpan={3} className="p-4 text-right font-semibold">Total</td>
                   <td className="p-4 font-semibold">{formatINR(order.total as number)}</td>

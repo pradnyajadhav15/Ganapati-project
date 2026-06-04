@@ -1,4 +1,4 @@
-import "server-only";
+﻿import "server-only";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 
 export type ReceiptOrder = {
@@ -6,6 +6,9 @@ export type ReceiptOrder = {
   customer_name: string | null;
   phone: string | null;
   address: string | null;
+  subtotal?: number | null;
+  discount?: number | null;
+  coupon_code?: string | null;
   total: number;
   razorpay_payment_id: string | null;
   created_at: string;
@@ -114,7 +117,19 @@ export async function generateReceiptPdf(
 
   y -= 6;
   page.drawLine({ start: { x: left, y }, end: { x: right, y }, color: line, thickness: 0.5 });
-  y -= 22;
+  y -= 20;
+
+  const discount = Number(order.discount ?? 0);
+  if (discount > 0) {
+    const subtotal = Number(order.subtotal ?? order.total + discount);
+    page.drawText("Subtotal", { x: 420, y, font, size: 10, color: soft });
+    page.drawText(`Rs ${subtotal.toLocaleString("en-IN")}`, { x: 490, y, font, size: 10, color: ink });
+    y -= 16;
+    const dLabel = order.coupon_code ? `Discount (${order.coupon_code})` : "Discount";
+    page.drawText(dLabel, { x: 300, y, font, size: 10, color: sage });
+    page.drawText(`- Rs ${discount.toLocaleString("en-IN")}`, { x: 490, y, font, size: 10, color: sage });
+    y -= 18;
+  }
 
   page.drawText("Total", { x: 420, y, font: bold, size: 13, color: ink });
   page.drawText(`Rs ${order.total.toLocaleString("en-IN")}`, { x: 490, y, font: bold, size: 13, color: ink });

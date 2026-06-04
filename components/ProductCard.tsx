@@ -1,11 +1,13 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import Image from "next/image";
 import { Product, formatINR, localizedName } from "@/lib/products";
 import { getLocale } from "@/lib/locale";
+import { getDict } from "@/lib/i18n";
 import AddToCartButtons from "@/components/AddToCartButtons";
 
 export default function ProductCard({ product }: { product: Product }) {
   const locale = getLocale();
+  const t = getDict(locale);
   const displayName = localizedName(product, locale);
 
   const waText = encodeURIComponent("Hi, I'm interested in " + displayName + (product.size ? " " + product.size : "") + ".");
@@ -22,6 +24,11 @@ export default function ProductCard({ product }: { product: Product }) {
               <span className="font-display text-lg italic text-white/70">R. Ramesh Arts</span>
             </div>
           )}
+          {!product.in_stock && (
+            <span className="absolute left-3 top-3 rounded-full bg-ink/85 px-3 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-cream">
+              {t.soldOut}
+            </span>
+          )}
         </div>
       </Link>
       <div className="p-[18px]">
@@ -30,7 +37,13 @@ export default function ProductCard({ product }: { product: Product }) {
         )}
         <h3 className="mb-1 mt-2.5 text-[1.15rem]">{displayName}{product.size ? " " + product.size : ""}</h3>
         <div className="font-display text-[1.2rem] text-terracotta">{formatINR(product.price)}</div>
-        <AddToCartButtons product={{ id: product.id, name: displayName, price: product.price, size: product.size, image_url: product.image_url }} />
+        {product.in_stock ? (
+          <AddToCartButtons product={{ id: product.id, name: displayName, price: product.price, size: product.size, image_url: product.image_url }} />
+        ) : (
+          <button disabled className="mt-3 w-full cursor-not-allowed rounded-full bg-cream-deep py-2.5 text-center text-[0.85rem] font-semibold text-ink-soft">
+            {t.soldOut}
+          </button>
+        )}
         <a href={waHref} target="_blank" rel="noreferrer" className="mt-2 block rounded-full border border-sage py-2 text-center text-[0.8rem] font-semibold text-sage-deep transition hover:bg-sage hover:text-white">Order on WhatsApp</a>
       </div>
     </div>

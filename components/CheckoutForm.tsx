@@ -1,11 +1,11 @@
-"use client";
+﻿"use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useCart } from "@/components/CartProvider";
 import { useLocale } from "@/components/LocaleProvider";
-import { placeOrder, verifyPayment } from "@/app/checkout/actions";
+import { placeOrder, verifyPayment, previewCoupon } from "@/app/checkout/actions";
 import { formatINR } from "@/lib/format";
 
 const field =
@@ -31,6 +31,19 @@ export default function CheckoutForm({ defaultName }: { defaultName: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [coupon, setCoupon] = useState("");
+  const [appliedCode, setAppliedCode] = useState<string | null>(null);
+  const [discount, setDiscount] = useState(0);
+  const [couponMsg, setCouponMsg] = useState<string | null>(null);
+  const [applying, setApplying] = useState(false);
+
+  // If the cart changes, clear any applied coupon (it must be re-applied).
+  useEffect(() => {
+    setAppliedCode(null);
+    setDiscount(0);
+    setCouponMsg(null);
+  }, [total]);
+
   if (!ready) return <section className="site-wrap py-20" />;
 
   if (!items.length) {
@@ -42,6 +55,34 @@ export default function CheckoutForm({ defaultName }: { defaultName: string }) {
         </Link>
       </section>
     );
+  }
+
+  const payable = Math.max(0, total - discount);
+
+  async function applyCoupon() {
+    if (!coupon.trim()) return;
+    setApplying(true);
+    setCouponMsg(null);
+    const res = await previewCoupon({
+      items: items.map((i) => ({ id: i.id, qty: i.qty })),
+      code: coupon,
+    });
+    if (res.valid) {
+      setDiscount(res.discount);
+      setAppliedCode(coupon.trim().toUpperCase());
+    } else {
+      setDiscount(0);
+      setAppliedCode(null);
+    }
+    setCouponMsg(res.message);
+    setApplying(false);
+  }
+
+  function removeCoupon() {
+    setCoupon("");
+    setAppliedCode(null);
+    setDiscount(0);
+    setCouponMsg(null);
   }
 
   async function pay() {
@@ -57,6 +98,7 @@ export default function CheckoutForm({ defaultName }: { defaultName: string }) {
       name: form.name,
       phone: form.phone,
       address: form.address,
+      couponCode: appliedCode ?? undefined,
     });
     if (order.error || !order.razorpayOrderId) {
       setError(order.error || t.somethingWrong);
@@ -136,12 +178,54 @@ export default function CheckoutForm({ defaultName }: { defaultName: string }) {
             </div>
           ))}
         </div>
-        <div className="mt-4 flex justify-between border-t border-line pt-4">
-          <span>{t.total}</span>
-          <b className="font-display text-xl text-terracotta">{formatINR(total)}</b>
+
+        <div className="mt-4 border-t border-line pt-4">
+          <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink-soft">
+            Discount code
+          </label>
+          <div className="flex gap-2">
+            <input
+              value={coupon}
+              onChange={(e) => setCoupon(e.target.value.toUpperCase())}
+              placeholder="e.g. GANESH10"
+              className="w-full rounded-lg border border-line bg-white px-3 py-2 text-sm uppercase outline-none focus:border-sage-deep"
+            />
+            {appliedCode ? (
+              <button type="button" onClick={removeCoupon} className="flex-none rounded-lg border border-line px-3 py-2 text-xs font-semibold text-ink-soft">
+                Remove
+              </button>
+            ) : (
+              <button type="button" onClick={applyCoupon} disabled={applying || !coupon.trim()} className="flex-none rounded-lg border border-sage-deep px-3 py-2 text-xs font-semibold text-sage-deep disabled:opacity-50">
+                {applying ? "..." : "Apply"}
+              </button>
+            )}
+          </div>
+          {couponMsg && (
+            <p className={"mt-2 text-xs " + (discount > 0 ? "text-sage-deep" : "text-red-600")}>{couponMsg}</p>
+          )}
         </div>
+
+        <div className="mt-4 space-y-1 border-t border-line pt-4 text-sm">
+          {discount > 0 && (
+            <>
+              <div className="flex justify-between text-ink-soft">
+                <span>Subtotal</span>
+                <span>{formatINR(total)}</span>
+              </div>
+              <div className="flex justify-between text-sage-deep">
+                <span>Discount{appliedCode ? ` (${appliedCode})` : ""}</span>
+                <span>-{formatINR(discount)}</span>
+              </div>
+            </>
+          )}
+          <div className="flex justify-between pt-1">
+            <span className="font-medium">{t.total}</span>
+            <b className="font-display text-xl text-terracotta">{formatINR(payable)}</b>
+          </div>
+        </div>
+
         <button onClick={pay} disabled={loading} className="btn-primary mt-5 block w-full text-center disabled:opacity-60">
-          {loading ? t.processing : `${t.pay} ${formatINR(total)}`}
+          {loading ? t.processing : `${t.pay} ${formatINR(payable)}`}
         </button>
         <p className="mt-3 text-center text-xs text-ink-soft">
           {t.securePayment}

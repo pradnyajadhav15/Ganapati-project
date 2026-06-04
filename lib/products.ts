@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+﻿import { supabase } from "./supabase";
 import { type Locale } from "./i18n";
 
 export type Category = "dashboard-idols" | "shadu-mati-idols" | "fiber-idols" | "pop-idols";
@@ -16,6 +16,7 @@ export type Product = {
   description_hi: string | null;
   description_mr: string | null;
   image_url: string | null;
+  image_urls: string[];
   in_stock: boolean;
   created_at?: string;
 };
@@ -88,4 +89,38 @@ export async function getProduct(id: string): Promise<Product | null> {
     .single();
   if (error) return null;
   return data as Product;
+}
+
+export async function searchProducts(opts: {
+  q?: string;
+  category?: Category | "all";
+  sort?: "newest" | "price-asc" | "price-desc";
+}): Promise<Product[]> {
+  let query = supabase.from("products").select("*");
+
+  if (opts.category && opts.category !== "all") {
+    query = query.eq("category", opts.category);
+  }
+
+  const term = (opts.q ?? "").trim().replace(/[%,()]/g, "");
+  if (term) {
+    query = query.or(
+      `name.ilike.%${term}%,name_hi.ilike.%${term}%,name_mr.ilike.%${term}%`
+    );
+  }
+
+  if (opts.sort === "price-asc") {
+    query = query.order("price", { ascending: true });
+  } else if (opts.sort === "price-desc") {
+    query = query.order("price", { ascending: false });
+  } else {
+    query = query.order("created_at", { ascending: false });
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    console.error("searchProducts:", error.message);
+    return [];
+  }
+  return (data ?? []) as Product[];
 }

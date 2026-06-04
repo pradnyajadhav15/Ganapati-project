@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Fraunces, Mukta } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CartProvider from "@/components/CartProvider";
 import { LocaleProvider } from "@/components/LocaleProvider";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import { getLocale } from "@/lib/locale";
 
 const fraunces = Fraunces({
@@ -22,6 +24,7 @@ const mukta = Mukta({
 });
 
 const siteUrl = "https://www.rrameshartsstudio.in";
+const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -57,18 +60,43 @@ export const metadata: Metadata = {
   },
 };
 
+const businessJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  name: "R. Ramesh Arts Studio",
+  image: siteUrl + "/og-image.jpg",
+  "@id": siteUrl,
+  url: siteUrl,
+  telephone: "+917020290393",
+  priceRange: "INR",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "34/A1/26, Geeta Nagar, New Paccha Peth",
+    addressLocality: "Solapur",
+    postalCode: "413005",
+    addressRegion: "Maharashtra",
+    addressCountry: "IN",
+  },
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = getLocale();
   return (
     <CartProvider>
       <html lang={locale} className={fraunces.variable + " " + mukta.variable}>
         <body>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(businessJsonLd) }}
+          />
           <LocaleProvider locale={locale}>
             <AnnouncementBar />
             <Navbar />
             <main>{children}</main>
             <Footer />
+            <WhatsAppButton />
           </LocaleProvider>
+          {gaId ? <GoogleAnalytics gaId={gaId} /> : null}
         </body>
       </html>
     </CartProvider>

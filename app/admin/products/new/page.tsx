@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { createProduct } from "../../actions";
 import { CATEGORY_META, Category } from "@/lib/products";
 
@@ -75,9 +75,15 @@ export default function NewProductPage() {
         <p className="text-xs text-ink-soft">Hindi & Marathi fields are optional — if left blank, the English version is shown.</p>
 
         <div>
-          <label className="mb-1 block text-sm font-medium">Photo</label>
+          <label className="mb-1 block text-sm font-medium">Main photo</label>
           <input name="image" type="file" accept="image/*" className={field} />
-          <p className="mt-1 text-xs text-ink-soft">Optional now - leave empty to use a placeholder.</p>
+          <p className="mt-1 text-xs text-ink-soft">Optional now — leave empty to use a placeholder.</p>
+        </div>
+
+        <div>
+          <label className="mb-1 block text-sm font-medium">Additional photos (optional)</label>
+          <input name="images" type="file" accept="image/*" multiple className={field} />
+          <p className="mt-1 text-xs text-ink-soft">Select one or more extra photos — they show as a gallery on the product page.</p>
         </div>
 
         <button type="submit" className="btn-primary w-full text-center">Save Idol</button>

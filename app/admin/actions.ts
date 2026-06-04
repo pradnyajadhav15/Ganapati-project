@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -28,19 +28,28 @@ export async function logout() {
 
 // --- Product management ---
 
+async function uploadImage(file: File): Promise<string> {
+  const ext = file.name.split(".").pop() || "jpg";
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  const bytes = await file.arrayBuffer();
+  const { error: upErr } = await supabaseAdmin.storage
+    .from("product-images")
+    .upload(path, bytes, { contentType: file.type, upsert: false });
+  if (upErr) throw new Error("Image upload failed: " + upErr.message);
+  return supabaseAdmin.storage.from("product-images").getPublicUrl(path).data.publicUrl;
+}
+
 export async function createProduct(formData: FormData) {
   const file = formData.get("image") as File | null;
   let image_url: string | null = null;
-
   if (file && file.size > 0) {
-    const ext = file.name.split(".").pop() || "jpg";
-    const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-    const bytes = await file.arrayBuffer();
-    const { error: upErr } = await supabaseAdmin.storage
-      .from("product-images")
-      .upload(path, bytes, { contentType: file.type, upsert: false });
-    if (upErr) throw new Error("Image upload failed: " + upErr.message);
-    image_url = supabaseAdmin.storage.from("product-images").getPublicUrl(path).data.publicUrl;
+    image_url = await uploadImage(file);
+  }
+
+  const extraFiles = (formData.getAll("images") as File[]).filter((f) => f && f.size > 0);
+  const image_urls: string[] = [];
+  for (const f of extraFiles) {
+    image_urls.push(await uploadImage(f));
   }
 
   const { error } = await supabaseAdmin.from("products").insert({
@@ -55,6 +64,7 @@ export async function createProduct(formData: FormData) {
     description_hi: formData.get("description_hi") || null,
     description_mr: formData.get("description_mr") || null,
     image_url,
+    image_urls,
     in_stock: true,
   });
   if (error) throw new Error(error.message);
@@ -76,19 +86,11 @@ export async function updateProduct(formData: FormData) {
   const id = formData.get("id") as string;
 
   const file = formData.get("image") as File | null;
-  let image_url: string | null = null;
   let hasNewImage = false;
-
+  let image_url: string | null = null;
   if (file && file.size > 0) {
     hasNewImage = true;
-    const ext = file.name.split(".").pop() || "jpg";
-    const path = Date.now() + "-" + Math.random().toString(36).slice(2) + "." + ext;
-    const bytes = await file.arrayBuffer();
-    const { error: upErr } = await supabaseAdmin.storage
-      .from("product-images")
-      .upload(path, bytes, { contentType: file.type, upsert: false });
-    if (upErr) throw new Error("Image upload failed: " + upErr.message);
-    image_url = supabaseAdmin.storage.from("product-images").getPublicUrl(path).data.publicUrl;
+    image_url = await uploadImage(file);
   }
 
   const updates: Record<string, unknown> = {
@@ -104,6 +106,25 @@ export async function updateProduct(formData: FormData) {
     description_mr: formData.get("description_mr") || null,
   };
   if (hasNewImage) updates.image_url = image_url;
+  updates.in_stock = formData.get("in_stock") === "on";
+
+  const clearExtra = formData.get("clear_images") === "on";
+  const extraFiles = (formData.getAll("images") as File[]).filter((f) => f && f.size > 0);
+  if (clearExtra || extraFiles.length) {
+    let gallery: string[] = [];
+    if (!clearExtra) {
+      const { data: existing } = await supabaseAdmin
+        .from("products")
+        .select("image_urls")
+        .eq("id", id)
+        .single();
+      gallery = (existing?.image_urls as string[]) ?? [];
+    }
+    for (const f of extraFiles) {
+      gallery.push(await uploadImage(f));
+    }
+    updates.image_urls = gallery;
+  }
 
   const { error } = await supabaseAdmin.from("products").update(updates).eq("id", id);
   if (error) throw new Error(error.message);
@@ -128,4 +149,19 @@ export async function updateOrderStatus(formData: FormData) {
 
   revalidatePath("/admin/" + id);
   revalidatePath("/admin/orders");
+}
+
+// --- Booking management ---
+
+export async function updateBookingStatus(formData: FormData) {
+  const id = formData.get("id") as string;
+  const status = formData.get("status") as string;
+
+  const { error } = await supabaseAdmin
+    .from("bookings")
+    .update({ status })
+    .eq("id", id);
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin/bookings");
 }

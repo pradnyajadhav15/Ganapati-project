@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { updateProduct } from "../../../actions";
@@ -13,12 +13,12 @@ export default async function EditProductPage({ params }: { params: { id: string
   const product = await getProduct(params.id);
   if (!product) notFound();
 
-  // Read optional translation fields safely (they exist in the DB even if not in the type yet)
   const p = product as typeof product & {
     name_hi?: string | null;
     name_mr?: string | null;
     description_hi?: string | null;
     description_mr?: string | null;
+    image_urls?: string[] | null;
   };
 
   const cats = Object.keys(CATEGORY_META) as Category[];
@@ -91,7 +91,7 @@ export default async function EditProductPage({ params }: { params: { id: string
         <p className="text-xs text-ink-soft">Hindi & Marathi are optional — blank fields fall back to English.</p>
 
         <div>
-          <label className="mb-1 block text-sm font-medium">Photo</label>
+          <label className="mb-1 block text-sm font-medium">Main photo</label>
           {product.image_url ? (
             <div className="relative mb-2 h-24 w-24 overflow-hidden rounded-lg border border-line">
               <Image src={product.image_url} alt={product.name} fill className="object-cover" />
@@ -101,7 +101,30 @@ export default async function EditProductPage({ params }: { params: { id: string
           <p className="mt-1 text-xs text-ink-soft">Leave empty to keep the current photo.</p>
         </div>
 
+        <div>
+          <label className="mb-1 block text-sm font-medium">Additional photos (optional)</label>
+          {p.image_urls && p.image_urls.length > 0 ? (
+            <div className="mb-2 flex flex-wrap gap-2">
+              {p.image_urls.map((src, i) => (
+                <div key={i} className="relative h-20 w-20 overflow-hidden rounded-lg border border-line">
+                  <Image src={src} alt={product.name + " " + (i + 1)} fill className="object-cover" />
+                </div>
+              ))}
+            </div>
+          ) : null}
+          <input name="images" type="file" accept="image/*" multiple className={field} />
+          <p className="mt-1 text-xs text-ink-soft">New photos are added to the gallery. Leave empty to keep the current ones.</p>
+          <label className="mt-2 flex items-center gap-2 text-sm text-ink-soft">
+            <input type="checkbox" name="clear_images" />
+            Remove existing extra photos before adding new ones
+          </label>
+        </div>
+
         <button type="submit" className="btn-primary w-full text-center">Update Idol</button>
+        <label className="flex items-center gap-2 text-sm font-medium">
+          <input type="checkbox" name="in_stock" defaultChecked={product.in_stock} />
+          In stock (uncheck to mark this idol as Sold Out)
+        </label>
       </form>
     </section>
   );

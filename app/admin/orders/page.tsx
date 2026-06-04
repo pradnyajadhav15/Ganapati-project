@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { formatINR } from "@/lib/format";
 
@@ -16,7 +16,7 @@ const statusColor: Record<string, string> = {
 export default async function AdminOrdersPage() {
   const { data: orders } = await supabaseAdmin
     .from("orders")
-    .select("id,customer_name,phone,total,status,razorpay_payment_id,receipt_url,created_at")
+    .select("id,customer_name,phone,total,discount,coupon_code,status,razorpay_payment_id,receipt_url,created_at")
     .order("created_at", { ascending: false });
 
   return (
@@ -56,7 +56,14 @@ export default async function AdminOrdersPage() {
                     day: "2-digit", month: "short", year: "numeric",
                   })}
                 </td>
-                <td className="p-4">{formatINR(o.total as number)}</td>
+                <td className="p-4">
+                  {formatINR(o.total as number)}
+                  {(o.discount as number) > 0 && (
+                    <div className="text-[11px] font-normal text-sage-deep">
+                      {o.coupon_code as string} (-{formatINR(o.discount as number)})
+                    </div>
+                  )}
+                </td>
                 <td className="p-4">
                   <span
                     className={`rounded-full px-2.5 py-1 text-xs capitalize ${

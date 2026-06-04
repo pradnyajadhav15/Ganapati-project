@@ -1,6 +1,7 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { getLocale } from "@/lib/locale";
 import { getDict } from "@/lib/i18n";
+import NewsletterSignup from "@/components/NewsletterSignup";
 
 export default function Footer() {
   const locale = getLocale();
@@ -9,6 +10,8 @@ export default function Footer() {
   return (
     <footer className="bg-sage-deep pb-7 pt-16 text-[#f3ede2]">
       <div className="site-wrap">
+        <NewsletterSignup />
+
         <div className="grid gap-9 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
           <div>
             <h4 className="mb-2 font-display text-xl text-white">
@@ -32,6 +35,7 @@ export default function Footer() {
             items={[
               [t.aboutUs, "/about"],
               [t.contactUs, "/contact"],
+              [t.faq, "/faq"],
               [t.initiative, "/initiative"],
               [t.collections, "/collections/shadu-mati-idols"],
               [t.news, "/media-coverage"],

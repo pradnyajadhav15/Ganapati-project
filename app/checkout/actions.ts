@@ -1,17 +1,33 @@
-"use server";
+﻿"use server";
 
 import crypto from "crypto";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { generateReceiptPdf } from "@/lib/receipt";
-import { notifyOwnerOfOrder } from "@/lib/email";
+import { notifyOwnerOfOrder, notifyCustomerOfOrder } from "@/lib/email";
+import { validateCoupon } from "@/lib/coupons";
 
 type Input = {
   items: { id: string; qty: number }[];
   name: string;
   phone: string;
   address: string;
+  couponCode?: string;
 };
+
+export async function previewCoupon(input: {
+  items: { id: string; qty: number }[];
+  code: string;
+}): Promise<{ valid: boolean; discount: number; subtotal: number; total: number; message: string }> {
+  const ids = input.items.map((i) => i.id);
+  const { data: products } = await supabaseAdmin
+    .from("products").select("id,price").in("id", ids);
+  const map = new Map((products ?? []).map((p) => [p.id, p.price as number]));
+  const subtotal = input.items.reduce((s, i) => s + (map.get(i.id) ?? 0) * i.qty, 0);
+  const res = await validateCoupon(input.code, subtotal);
+  if (!res.valid) return { valid: false, discount: 0, subtotal, total: subtotal, message: res.message };
+  return { valid: true, discount: res.discount, subtotal, total: subtotal - res.discount, message: res.message };
+}
 
 export async function placeOrder(input: Input): Promise<{
   error?: string;
@@ -47,7 +63,17 @@ export async function placeOrder(input: Input): Promise<{
     });
   if (!orderItems.length) return { error: "No valid products in cart." };
 
-  const total = orderItems.reduce((s, i) => s + i.price * i.qty, 0);
+  const subtotal = orderItems.reduce((s, i) => s + i.price * i.qty, 0);
+
+  let discount = 0;
+  let couponCode: string | null = null;
+  if (input.couponCode && input.couponCode.trim()) {
+    const res = await validateCoupon(input.couponCode, subtotal);
+    if (!res.valid) return { error: res.message };
+    discount = res.discount;
+    couponCode = res.code;
+  }
+  const finalTotal = Math.max(0, subtotal - discount);
 
   const { data: order, error: oErr } = await supabaseAdmin
     .from("orders")
@@ -56,7 +82,10 @@ export async function placeOrder(input: Input): Promise<{
       customer_name: input.name,
       phone: input.phone,
       address: input.address,
-      total,
+      subtotal,
+      discount,
+      coupon_code: couponCode,
+      total: finalTotal,
       status: "pending",
     })
     .select("id")
@@ -73,7 +102,7 @@ export async function placeOrder(input: Input): Promise<{
   const rzpRes = await fetch("https://api.razorpay.com/v1/orders", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Basic ${auth}` },
-    body: JSON.stringify({ amount: total * 100, currency: "INR", receipt: order.id }),
+    body: JSON.stringify({ amount: finalTotal * 100, currency: "INR", receipt: order.id }),
   });
   const rzpOrder = await rzpRes.json();
   if (!rzpRes.ok || !rzpOrder.id) {
@@ -88,7 +117,7 @@ export async function placeOrder(input: Input): Promise<{
   return {
     orderId: order.id,
     razorpayOrderId: rzpOrder.id,
-    amount: total * 100,
+    amount: finalTotal * 100,
     keyId: process.env.RAZORPAY_KEY_ID!,
   };
 }
@@ -108,7 +137,6 @@ export async function verifyPayment(input: {
     return { error: "Payment verification failed." };
   }
 
-  // 1) Mark order as paid first so we don't lose the paid state if PDF gen fails.
   const { error } = await supabaseAdmin
     .from("orders")
     .update({ status: "paid", razorpay_payment_id: input.razorpay_payment_id })
@@ -116,18 +144,43 @@ export async function verifyPayment(input: {
     .eq("razorpay_order_id", input.razorpay_order_id);
   if (error) return { error: error.message };
 
-  // 2) Generate and upload the receipt PDF. Failures here don't block "ok".
   try {
     await buildAndSaveReceipt(input.orderId);
   } catch (e) {
     console.error("Receipt generation failed:", e);
   }
 
-  // 3) Email the owner about the new paid order.
   try {
     await notifyOwnerOfOrder(input.orderId);
   } catch (e) {
     console.error("Order notification email failed:", e);
+  }
+
+  try {
+    const supabase = createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user?.email) {
+      await notifyCustomerOfOrder(input.orderId, user.email);
+    }
+  } catch (e) {
+    console.error("Customer confirmation email failed:", e);
+  }
+
+  try {
+    const { data: ord } = await supabaseAdmin
+      .from("orders").select("coupon_code").eq("id", input.orderId).single();
+    if (ord?.coupon_code) {
+      const { data: c } = await supabaseAdmin
+        .from("coupons").select("id,used_count").ilike("code", ord.coupon_code).maybeSingle();
+      if (c) {
+        await supabaseAdmin
+          .from("coupons").update({ used_count: (c.used_count ?? 0) + 1 }).eq("id", c.id);
+      }
+    }
+  } catch (e) {
+    console.error("Coupon usage increment failed:", e);
   }
 
   return { ok: true };
@@ -136,7 +189,7 @@ export async function verifyPayment(input: {
 async function buildAndSaveReceipt(orderId: string) {
   const { data: order, error: oErr } = await supabaseAdmin
     .from("orders")
-    .select("id,customer_name,phone,address,total,razorpay_payment_id,created_at")
+    .select("id,customer_name,phone,address,subtotal,discount,coupon_code,total,razorpay_payment_id,created_at")
     .eq("id", orderId)
     .single();
   if (oErr || !order) throw new Error(oErr?.message || "Order not found");
@@ -160,12 +213,12 @@ async function buildAndSaveReceipt(orderId: string) {
   await supabaseAdmin.from("orders").update({ receipt_url: url }).eq("id", orderId);
 }
 
-// Admin-only — called from the order detail page to (re)generate a missing or stale receipt.
 export async function regenerateReceipt(orderId: string): Promise<{ error?: string; ok?: boolean }> {
   try {
     await buildAndSaveReceipt(orderId);
     return { ok: true };
   } catch (e) {
-    console.error("regenerateReceipt failed ->", e); return { error: e instanceof Error ? e.message : "Failed" };
+    console.error("regenerateReceipt failed ->", e);
+    return { error: e instanceof Error ? e.message : "Failed" };
   }
 }

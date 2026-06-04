@@ -1,4 +1,5 @@
 import PageHero from "@/components/PageHero";
+import ContactForm from "@/components/ContactForm";
 import { getLocale } from "@/lib/locale";
 import { getDict } from "@/lib/i18n";
 
@@ -44,6 +45,8 @@ export default function Page() {
               <iframe title="R. Ramesh Arts Studio location" src="https://www.google.com/maps?q=Geeta+Nagar+New+Paccha+Peth+Solapur+413005&z=15&output=embed" width="100%" height="320" style={{ border: 0 }} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen></iframe>
             </div>
           </div>
+
+          <ContactForm />
         </div>
       </section>
     </>

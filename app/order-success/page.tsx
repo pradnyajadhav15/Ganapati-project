@@ -56,7 +56,7 @@ export default async function OrderSuccessPage({
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           {order?.receipt_url && (
-            
+            <a
               href={order.receipt_url as string}
               target="_blank"
               rel="noreferrer"

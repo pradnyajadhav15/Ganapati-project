@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import Image from "next/image";
 import { getProducts, formatINR, CATEGORY_META } from "@/lib/products";
 import { deleteProduct, logout } from "./actions";
@@ -16,9 +16,27 @@ export default async function AdminPage() {
           <h1 className="text-3xl">Products</h1>
           <p className="text-ink-soft">{products.length} idols in catalogue</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <Link href="/admin/orders" className="btn-ghost">
             View Orders
+          </Link>
+          <Link href="/admin/bookings" className="btn-ghost">
+            Pre-bookings
+          </Link>
+          <Link href="/admin/subscribers" className="btn-ghost">
+            Subscribers
+          </Link>
+          <Link href="/admin/accessories" className="btn-ghost">
+            Accessories
+          </Link>
+          <Link href="/admin/testimonials" className="btn-ghost">
+            Testimonials
+          </Link>
+           <Link href="/admin/coupons" className="btn-ghost">
+            Coupons
+          </Link>
+            <Link href="/admin/gallery" className="btn-ghost">
+            Gallery
           </Link>
           <Link href="/admin/products/new" className="btn-primary">
             + Add Product

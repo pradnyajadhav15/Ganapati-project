@@ -1,23 +1,27 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import Image from "next/image";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import CartIcon from "@/components/CartIcon";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import MobileMenu from "@/components/MobileMenu";
 import { getDict, type Dict } from "@/lib/i18n";
 import { getLocale } from "@/lib/locale";
 
 const links = [
   { href: "/customized-work", key: "customizedWork" },
+  { href: "/our-work", key: "ourWork" },
   { href: "/partnership", key: "partnership" },
   { href: "/initiative", key: "initiative" },
   { href: "/media-coverage", key: "mediaCoverage" },
 ] as const;
 
 const collections = [
+  { href: "/shop", key: "shopAll" },
   { href: "/collections/dashboard-idols", key: "dashboardIdols" },
   { href: "/collections/shadu-mati-idols", key: "shaduMatiIdols" },
   { href: "/collections/fiber-idols", key: "fiberIdols" },
   { href: "/collections/pop-idols", key: "popIdols" },
+  { href: "/collections/accessories", key: "ganpatiShastra" },
 ] as const;
 
 export default async function Navbar() {
@@ -28,6 +32,9 @@ export default async function Navbar() {
 
   const locale = getLocale();
   const t = getDict(locale);
+
+  const collectionItems = collections.map((c) => ({ href: c.href, label: t[c.key as keyof Dict] }));
+  const linkItems = links.map((l) => ({ href: l.href, label: t[l.key as keyof Dict] }));
 
   return (
     <nav className="sticky top-0 z-50 border-b border-line bg-cream/90 backdrop-blur-md">
@@ -54,7 +61,7 @@ export default async function Navbar() {
           </span>
         </Link>
 
-        {/* Menu */}
+        {/* Desktop Menu */}
         <div className="hidden items-center gap-8 text-[0.92rem] md:flex">
           <Link href="/" className="text-ink-soft transition hover:text-ink">
             {t.home}
@@ -88,22 +95,28 @@ export default async function Navbar() {
           ))}
         </div>
 
-        {/* Language + account + cart */}
+        {/* Right cluster */}
         <div className="flex items-center gap-3 text-[0.92rem]">
           <LanguageSwitcher current={locale} />
           {user ? (
-            <Link href="/account" className="text-ink-soft transition hover:text-ink">
+            <Link href="/account" className="hidden text-ink-soft transition hover:text-ink sm:block">
               {t.account}
             </Link>
           ) : (
             <Link
               href="/login"
-              className="rounded-full border-[1.5px] border-ink px-4 py-1.5 text-ink transition hover:bg-ink hover:text-cream"
+              className="hidden rounded-full border-[1.5px] border-ink px-4 py-1.5 text-ink transition hover:bg-ink hover:text-cream sm:block"
             >
               {t.logIn}
             </Link>
           )}
           <CartIcon />
+          <MobileMenu
+            home={t.home}
+            ourCollections={t.ourCollections}
+            collections={collectionItems}
+            links={linkItems}
+          />
         </div>
       </div>
     </nav>
