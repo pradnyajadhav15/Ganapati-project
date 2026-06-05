@@ -13,10 +13,17 @@ const statusColor: Record<string, string> = {
   cancelled: "bg-rose text-ink",
 };
 
+const methodLabel: Record<string, string> = { razorpay: "Online", upi: "UPI", cod: "COD" };
+const methodColor: Record<string, string> = {
+  razorpay: "bg-sage/15 text-sage-deep",
+  upi: "bg-peach text-ink",
+  cod: "bg-rose text-ink",
+};
+
 export default async function AdminOrdersPage() {
   const { data: orders } = await supabaseAdmin
     .from("orders")
-    .select("id,customer_name,phone,total,discount,coupon_code,status,razorpay_payment_id,receipt_url,created_at")
+    .select("id,customer_name,phone,total,discount,coupon_code,payment_method,status,razorpay_payment_id,receipt_url,created_at")
     .order("created_at", { ascending: false });
 
   return (
@@ -39,6 +46,7 @@ export default async function AdminOrdersPage() {
               <th className="p-4">Customer</th>
               <th className="p-4">Date</th>
               <th className="p-4">Total</th>
+              <th className="p-4">Payment</th>
               <th className="p-4">Status</th>
               <th className="p-4 text-right">Action</th>
             </tr>
@@ -65,26 +73,23 @@ export default async function AdminOrdersPage() {
                   )}
                 </td>
                 <td className="p-4">
-                  <span
-                    className={`rounded-full px-2.5 py-1 text-xs capitalize ${
-                      statusColor[o.status as string] ?? "bg-cream-deep text-ink-soft"
-                    }`}
-                  >
+                  <span className={`rounded-full px-2.5 py-1 text-xs ${methodColor[o.payment_method as string] ?? "bg-cream-deep text-ink-soft"}`}>
+                    {methodLabel[o.payment_method as string] ?? "—"}
+                  </span>
+                </td>
+                <td className="p-4">
+                  <span className={`rounded-full px-2.5 py-1 text-xs capitalize ${statusColor[o.status as string] ?? "bg-cream-deep text-ink-soft"}`}>
                     {o.status}
                   </span>
                 </td>
                 <td className="p-4 text-right">
-                  <Link href={`/admin/orders/${o.id}`} className="text-sage-deep underline">
-                    View
-                  </Link>
+                  <Link href={`/admin/orders/${o.id}`} className="text-sage-deep underline">View</Link>
                 </td>
               </tr>
             ))}
             {(!orders || orders.length === 0) && (
               <tr>
-                <td colSpan={6} className="p-8 text-center text-ink-soft">
-                  No orders yet.
-                </td>
+                <td colSpan={7} className="p-8 text-center text-ink-soft">No orders yet.</td>
               </tr>
             )}
           </tbody>

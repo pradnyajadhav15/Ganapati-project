@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { updateBookingStatus } from "@/app/admin/actions";
+import BookingAdvanceButton from "@/components/BookingAdvanceButton";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin - Bookings" };
@@ -17,6 +18,7 @@ type Booking = {
   balance_due: number;
   status: string;
   notes: string | null;
+  payment_link: string | null;
   created_at: string;
 };
 
@@ -35,7 +37,7 @@ export default async function AdminBookingsPage() {
 
   const { data } = await supabaseAdmin
     .from("bookings")
-    .select("id,product_name,customer_name,phone,total_price,token_amount,balance_due,status,notes,created_at")
+    .select("id,product_name,customer_name,phone,total_price,token_amount,balance_due,status,notes,payment_link,created_at")
     .order("created_at", { ascending: false });
 
   const bookings = (data ?? []) as Booking[];
@@ -75,6 +77,18 @@ export default async function AdminBookingsPage() {
                 <span>Full: <b>Rs {b.total_price.toLocaleString("en-IN")}</b></span>
                 <span>Advance: <b>Rs {b.token_amount.toLocaleString("en-IN")}</b></span>
                 <span>Balance: <b>Rs {b.balance_due.toLocaleString("en-IN")}</b></span>
+              </div>
+
+              <div className="mt-3 border-t border-line pt-3">
+                <BookingAdvanceButton
+                  bookingId={b.id}
+                  phone={b.phone}
+                  customerName={b.customer_name}
+                  productName={b.product_name}
+                  tokenAmount={b.token_amount}
+                  balanceDue={b.balance_due}
+                  existingLink={b.payment_link}
+                />
               </div>
 
               {b.notes && (

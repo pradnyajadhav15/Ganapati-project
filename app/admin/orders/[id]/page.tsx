@@ -4,6 +4,7 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 import { formatINR } from "@/lib/format";
 import { updateOrderStatus } from "../actions";
 import { regenerateReceipt } from "@/app/checkout/actions";
+import { revalidatePath } from "next/cache";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin - Order" };
@@ -14,6 +15,7 @@ async function regenerateAction(formData: FormData) {
   "use server";
   const id = String(formData.get("id"));
   await regenerateReceipt(id);
+  revalidatePath("/admin/orders/" + id);
 }
 
 export default async function AdminOrderDetail({ params }: { params: { id: string } }) {
@@ -21,6 +23,13 @@ export default async function AdminOrderDetail({ params }: { params: { id: strin
   if (!order) notFound();
 
   const { data: items } = await supabaseAdmin.from("order_items").select("*").eq("order_id", params.id);
+
+  const methodName =
+    order.payment_method === "razorpay" ? "Online (Razorpay)" :
+    order.payment_method === "upi" ? "UPI - Scan & Pay" :
+    order.payment_method === "cod" ? "Cash on Delivery" : "-";
+
+  const addressLine = [order.city, order.state, order.pincode].filter(Boolean).join(", ");
 
   return (
     <section className="site-wrap py-12">
@@ -39,11 +48,17 @@ export default async function AdminOrderDetail({ params }: { params: { id: strin
       <div className="mt-8 grid gap-6 md:grid-cols-[1fr_320px]">
         <div className="space-y-6">
           <div className="rounded-xl2 border border-line bg-white p-6">
-            <h2 className="text-lg">Customer</h2>
+            <h2 className="text-lg">Customer &amp; Delivery</h2>
             <div className="mt-3 space-y-1 text-sm">
-              <div>{order.customer_name}</div>
+              <div className="font-medium">{order.customer_name}</div>
               <div className="text-ink-soft">Phone: {order.phone}</div>
+              {order.email ? <div className="text-ink-soft">Email: {order.email as string}</div> : null}
               <div className="text-ink-soft">{order.address}</div>
+              {addressLine ? <div className="text-ink-soft">{addressLine}</div> : null}
+              <div className="mt-2 text-xs">
+                Delivery area:{" "}
+                <span className="font-medium">{order.delivery_area === "outside" ? "Outside Solapur" : "Within Solapur"}</span>
+              </div>
             </div>
           </div>
 
@@ -66,16 +81,24 @@ export default async function AdminOrderDetail({ params }: { params: { id: strin
                     <td className="p-4">{formatINR((it.price as number) * (it.qty as number))}</td>
                   </tr>
                 ))}
-                {(order.discount as number) > 0 && (
+                {((order.discount as number) > 0 || (order.shipping as number) > 0) && (
                   <>
                     <tr className="border-t border-line">
                       <td colSpan={3} className="p-4 text-right text-ink-soft">Subtotal</td>
-                      <td className="p-4 text-ink-soft">{formatINR(Number(order.subtotal ?? (order.total as number) + (order.discount as number)))}</td>
+                      <td className="p-4 text-ink-soft">{formatINR(Number(order.subtotal ?? 0))}</td>
                     </tr>
-                    <tr className="border-t border-line">
-                      <td colSpan={3} className="p-4 text-right text-sage-deep">Discount {order.coupon_code ? `(${order.coupon_code})` : ""}</td>
-                      <td className="p-4 text-sage-deep">-{formatINR(order.discount as number)}</td>
-                    </tr>
+                    {(order.discount as number) > 0 && (
+                      <tr className="border-t border-line">
+                        <td colSpan={3} className="p-4 text-right text-sage-deep">Discount {order.coupon_code ? `(${order.coupon_code})` : ""}</td>
+                        <td className="p-4 text-sage-deep">-{formatINR(order.discount as number)}</td>
+                      </tr>
+                    )}
+                    {(order.shipping as number) > 0 && (
+                      <tr className="border-t border-line">
+                        <td colSpan={3} className="p-4 text-right text-ink-soft">Shipping</td>
+                        <td className="p-4 text-ink-soft">{formatINR(order.shipping as number)}</td>
+                      </tr>
+                    )}
                   </>
                 )}
                 <tr className="border-t border-line bg-cream-deep">
@@ -103,7 +126,15 @@ export default async function AdminOrderDetail({ params }: { params: { id: strin
           <div className="rounded-xl2 border border-line bg-white p-6">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-ink-soft">Payment</h3>
             <div className="mt-3 space-y-1 text-sm">
-              <div className="text-ink-soft">Razorpay Payment ID</div>
+              <div>Method: <span className="font-medium">{methodName}</span></div>
+              {(order.payment_method === "cod" || order.payment_method === "upi") && (
+                <p className="mt-2 rounded-lg bg-cream-deep px-3 py-2 text-xs text-ink-soft">
+                  {order.payment_method === "cod"
+                    ? `Collect ${formatINR(order.total as number)} in cash on delivery.`
+                    : `Confirm UPI payment of ${formatINR(order.total as number)} before shipping.`}
+                </p>
+              )}
+              <div className="mt-2 text-ink-soft">Razorpay Payment ID</div>
               <div className="break-all font-mono text-xs">{order.razorpay_payment_id || "-"}</div>
               <div className="mt-2 text-ink-soft">Razorpay Order ID</div>
               <div className="break-all font-mono text-xs">{order.razorpay_order_id || "-"}</div>

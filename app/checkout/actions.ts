@@ -7,13 +7,23 @@ import { generateReceiptPdf } from "@/lib/receipt";
 import { notifyOwnerOfOrder, notifyCustomerOfOrder } from "@/lib/email";
 import { validateCoupon } from "@/lib/coupons";
 
+type PaymentMethod = "razorpay" | "upi" | "cod";
+
 type Input = {
   items: { id: string; qty: number }[];
   name: string;
+  email: string;
   phone: string;
   address: string;
+  city: string;
+  state: string;
+  pincode: string;
+  deliveryArea: "solapur" | "outside";
+  paymentMethod: PaymentMethod;
   couponCode?: string;
 };
+
+const SHIPPING_OUTSIDE = 100;
 
 export async function previewCoupon(input: {
   items: { id: string; qty: number }[];
@@ -32,6 +42,7 @@ export async function previewCoupon(input: {
 export async function placeOrder(input: Input): Promise<{
   error?: string;
   orderId?: string;
+  method?: PaymentMethod;
   razorpayOrderId?: string;
   amount?: number;
   keyId?: string;
@@ -73,15 +84,24 @@ export async function placeOrder(input: Input): Promise<{
     discount = res.discount;
     couponCode = res.code;
   }
-  const finalTotal = Math.max(0, subtotal - discount);
+
+  const shipping = input.deliveryArea === "outside" ? SHIPPING_OUTSIDE : 0;
+  const finalTotal = Math.max(0, subtotal - discount + shipping);
 
   const { data: order, error: oErr } = await supabaseAdmin
     .from("orders")
     .insert({
       user_id: user.id,
       customer_name: input.name,
+      email: input.email || null,
       phone: input.phone,
       address: input.address,
+      city: input.city || null,
+      state: input.state || null,
+      pincode: input.pincode || null,
+      delivery_area: input.deliveryArea,
+      shipping,
+      payment_method: input.paymentMethod,
       subtotal,
       discount,
       coupon_code: couponCode,
@@ -96,30 +116,53 @@ export async function placeOrder(input: Input): Promise<{
     .from("order_items")
     .insert(orderItems.map((oi) => ({ ...oi, order_id: order.id })));
 
-  const auth = Buffer.from(
-    `${process.env.RAZORPAY_KEY_ID}:${process.env.RAZORPAY_KEY_SECRET}`
-  ).toString("base64");
-  const rzpRes = await fetch("https://api.razorpay.com/v1/orders", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Basic ${auth}` },
-    body: JSON.stringify({ amount: finalTotal * 100, currency: "INR", receipt: order.id }),
-  });
-  const rzpOrder = await rzpRes.json();
-  if (!rzpRes.ok || !rzpOrder.id) {
-    return { error: "Could not start payment. Check your Razorpay keys." };
+  // ONLINE (Razorpay): create a payment order and hand it back to the browser.
+  if (input.paymentMethod === "razorpay") {
+    const auth = Buffer.from(
+      `${process.env.RAZORPAY_KEY_ID}:${process.env.RAZORPAY_KEY_SECRET}`
+    ).toString("base64");
+    const rzpRes = await fetch("https://api.razorpay.com/v1/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Basic ${auth}` },
+      body: JSON.stringify({ amount: finalTotal * 100, currency: "INR", receipt: order.id }),
+    });
+    const rzpOrder = await rzpRes.json();
+    if (!rzpRes.ok || !rzpOrder.id) {
+      return { error: "Could not start payment. Check your Razorpay keys." };
+    }
+    await supabaseAdmin
+      .from("orders")
+      .update({ razorpay_order_id: rzpOrder.id })
+      .eq("id", order.id);
+    return {
+      orderId: order.id,
+      method: "razorpay",
+      razorpayOrderId: rzpOrder.id,
+      amount: finalTotal * 100,
+      keyId: process.env.RAZORPAY_KEY_ID!,
+    };
   }
 
-  await supabaseAdmin
-    .from("orders")
-    .update({ razorpay_order_id: rzpOrder.id })
-    .eq("id", order.id);
+  // UPI QR or Cash on Delivery: order is placed as pending. Notify owner + count coupon now.
+  try {
+    await notifyOwnerOfOrder(order.id);
+  } catch (e) {
+    console.error("Owner notification failed:", e);
+  }
+  if (couponCode) {
+    try {
+      const { data: c } = await supabaseAdmin
+        .from("coupons").select("id,used_count").ilike("code", couponCode).maybeSingle();
+      if (c) {
+        await supabaseAdmin
+          .from("coupons").update({ used_count: (c.used_count ?? 0) + 1 }).eq("id", c.id);
+      }
+    } catch (e) {
+      console.error("Coupon usage increment failed:", e);
+    }
+  }
 
-  return {
-    orderId: order.id,
-    razorpayOrderId: rzpOrder.id,
-    amount: finalTotal * 100,
-    keyId: process.env.RAZORPAY_KEY_ID!,
-  };
+  return { orderId: order.id, method: input.paymentMethod };
 }
 
 export async function verifyPayment(input: {
@@ -189,7 +232,7 @@ export async function verifyPayment(input: {
 async function buildAndSaveReceipt(orderId: string) {
   const { data: order, error: oErr } = await supabaseAdmin
     .from("orders")
-    .select("id,customer_name,phone,address,subtotal,discount,coupon_code,total,razorpay_payment_id,created_at")
+    .select("id,customer_name,phone,address,subtotal,discount,coupon_code,shipping,total,razorpay_payment_id,created_at")
     .eq("id", orderId)
     .single();
   if (oErr || !order) throw new Error(oErr?.message || "Order not found");

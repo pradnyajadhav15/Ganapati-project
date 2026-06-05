@@ -1,5 +1,9 @@
-﻿import "server-only";
+﻿import "regenerator-runtime/runtime";
+import "server-only";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import fontkit from "@pdf-lib/fontkit";
+import fs from "fs";
+import path from "path";
 
 export type ReceiptOrder = {
   id: string;
@@ -9,6 +13,7 @@ export type ReceiptOrder = {
   subtotal?: number | null;
   discount?: number | null;
   coupon_code?: string | null;
+  shipping?: number | null;
   total: number;
   razorpay_payment_id: string | null;
   created_at: string;
@@ -41,9 +46,14 @@ export async function generateReceiptPdf(
   items: ReceiptItem[]
 ): Promise<Uint8Array> {
   const pdf = await PDFDocument.create();
+  pdf.registerFontkit(fontkit);
   const page = pdf.addPage([595, 842]);
   const font = await pdf.embedFont(StandardFonts.Helvetica);
   const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
+
+  // Unicode font for names, addresses and item titles (supports Marathi / Hindi).
+  const devaPath = path.join(process.cwd(), "public", "fonts", "NotoSansDevanagari-Regular.ttf");
+  const deva = await pdf.embedFont(fs.readFileSync(devaPath), { subset: true });
 
   const left = 50;
   const right = 545;
@@ -78,7 +88,7 @@ export async function generateReceiptPdf(
   page.drawText("Billed to", { x: left, y, font: bold, size: 11, color: ink });
   y -= 16;
   if (order.customer_name) {
-    page.drawText(order.customer_name, { x: left, y, font, size: 10, color: ink });
+    page.drawText(order.customer_name, { x: left, y, font: deva, size: 10, color: ink });
     y -= 14;
   }
   if (order.phone) {
@@ -86,7 +96,7 @@ export async function generateReceiptPdf(
     y -= 14;
   }
   for (const addrLine of wrap(order.address ?? "", 70)) {
-    page.drawText(addrLine, { x: left, y, font, size: 10, color: ink });
+    page.drawText(addrLine, { x: left, y, font: deva, size: 10, color: ink });
     y -= 14;
   }
 
@@ -103,13 +113,13 @@ export async function generateReceiptPdf(
   for (const it of items) {
     const lines = wrap(it.name, 50);
     const firstLine = lines.shift() ?? it.name;
-    page.drawText(firstLine, { x: left, y, font, size: 10, color: ink });
+    page.drawText(firstLine, { x: left, y, font: deva, size: 10, color: ink });
     page.drawText(String(it.qty), { x: 360, y, font, size: 10, color: ink });
     page.drawText(`Rs ${it.price.toLocaleString("en-IN")}`, { x: 420, y, font, size: 10, color: ink });
     page.drawText(`Rs ${(it.price * it.qty).toLocaleString("en-IN")}`, { x: 490, y, font, size: 10, color: ink });
     y -= 14;
     for (const cont of lines) {
-      page.drawText(cont, { x: left, y, font, size: 10, color: ink });
+      page.drawText(cont, { x: left, y, font: deva, size: 10, color: ink });
       y -= 14;
     }
     y -= 4;
@@ -120,15 +130,24 @@ export async function generateReceiptPdf(
   y -= 20;
 
   const discount = Number(order.discount ?? 0);
-  if (discount > 0) {
-    const subtotal = Number(order.subtotal ?? order.total + discount);
+  const shipping = Number(order.shipping ?? 0);
+  if (discount > 0 || shipping > 0) {
+    const subtotal = Number(order.subtotal ?? order.total + discount - shipping);
     page.drawText("Subtotal", { x: 420, y, font, size: 10, color: soft });
     page.drawText(`Rs ${subtotal.toLocaleString("en-IN")}`, { x: 490, y, font, size: 10, color: ink });
     y -= 16;
-    const dLabel = order.coupon_code ? `Discount (${order.coupon_code})` : "Discount";
-    page.drawText(dLabel, { x: 300, y, font, size: 10, color: sage });
-    page.drawText(`- Rs ${discount.toLocaleString("en-IN")}`, { x: 490, y, font, size: 10, color: sage });
-    y -= 18;
+    if (discount > 0) {
+      const dLabel = order.coupon_code ? `Discount (${order.coupon_code})` : "Discount";
+      page.drawText(dLabel, { x: 290, y, font, size: 10, color: sage });
+      page.drawText(`- Rs ${discount.toLocaleString("en-IN")}`, { x: 490, y, font, size: 10, color: sage });
+      y -= 16;
+    }
+    if (shipping > 0) {
+      page.drawText("Shipping", { x: 420, y, font, size: 10, color: soft });
+      page.drawText(`Rs ${shipping.toLocaleString("en-IN")}`, { x: 490, y, font, size: 10, color: ink });
+      y -= 16;
+    }
+    y -= 2;
   }
 
   page.drawText("Total", { x: 420, y, font: bold, size: 13, color: ink });

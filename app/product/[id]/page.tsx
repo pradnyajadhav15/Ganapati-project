@@ -80,7 +80,7 @@ export default async function ProductPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
         />
 
-        <ProductGallery images={galleryImages} alt={displayName} />
+        <ProductGallery images={galleryImages} alt={displayName} name={displayName} price={product.price} />
 
         <div className="flex flex-col justify-center">
           <Link
