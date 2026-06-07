@@ -107,6 +107,8 @@ export async function updateProduct(formData: FormData) {
   };
   if (hasNewImage) updates.image_url = image_url;
   updates.in_stock = formData.get("in_stock") === "on";
+  const capRaw = formData.get("season_capacity");
+  updates.season_capacity = capRaw === null || String(capRaw).trim() === "" ? null : Number(capRaw);
 
   const clearExtra = formData.get("clear_images") === "on";
   const extraFiles = (formData.getAll("images") as File[]).filter((f) => f && f.size > 0);
@@ -133,6 +135,23 @@ export async function updateProduct(formData: FormData) {
   revalidatePath("/");
   revalidatePath("/product/" + id);
   redirect("/admin");
+}
+
+export async function setOrderingStatus(formData: FormData) {
+  const ordering_open = formData.get("ordering_open") === "on";
+  const cutoffRaw = formData.get("order_cutoff");
+  const order_cutoff = cutoffRaw && String(cutoffRaw).trim() !== "" ? String(cutoffRaw) : null;
+  const msgRaw = formData.get("closed_message");
+  const closed_message = msgRaw && String(msgRaw).trim() !== "" ? String(msgRaw).trim() : null;
+
+  const { error } = await supabaseAdmin
+    .from("site_settings")
+    .update({ ordering_open, order_cutoff, closed_message })
+    .eq("id", 1);
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin");
+  revalidatePath("/");
 }
 
 // --- Order management ---

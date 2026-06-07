@@ -91,6 +91,12 @@ export default async function EditProductPage({ params }: { params: { id: string
         <p className="text-xs text-ink-soft">Hindi & Marathi are optional — blank fields fall back to English.</p>
 
         <div>
+          <label className="mb-1 block text-sm font-medium">Season capacity (optional)</label>
+          <input name="season_capacity" type="number" min="0" defaultValue={(product as any).season_capacity ?? ""} className={field} placeholder="e.g. 30 - blank = unlimited" />
+          <p className="mt-1 text-xs text-ink-soft">Max you will make this season. Auto sold-out when reached. Blank means no limit.</p>
+        </div>
+
+        <div>
           <label className="mb-1 block text-sm font-medium">Main photo</label>
           {product.image_url ? (
             <div className="relative mb-2 h-24 w-24 overflow-hidden rounded-lg border border-line">

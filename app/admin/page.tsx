@@ -1,13 +1,23 @@
 ﻿import Link from "next/link";
 import Image from "next/image";
 import { getProducts, formatINR, CATEGORY_META } from "@/lib/products";
-import { deleteProduct, logout } from "./actions";
+import { deleteProduct, logout, setOrderingStatus } from "./actions";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin — Products" };
 
 export default async function AdminPage() {
   const products = await getProducts();
+
+  const { data: settings } = await supabaseAdmin
+    .from("site_settings")
+    .select("ordering_open,order_cutoff,closed_message")
+    .eq("id", 1)
+    .maybeSingle();
+  const orderingOpen = settings?.ordering_open !== false;
+  const cutoff = (settings?.order_cutoff as string | null) ?? "";
+  const closedMsg = (settings?.closed_message as string | null) ?? "";
 
   return (
     <section className="site-wrap py-12">
@@ -52,6 +62,26 @@ export default async function AdminPage() {
           </form>
         </div>
       </div>
+
+      <form action={setOrderingStatus} className="mb-8 rounded-xl2 border border-line bg-white p-6">
+        <h2 className="text-lg">Season ordering</h2>
+        <p className="mt-1 text-xs text-ink-soft">When closed, the site stops taking new cart orders and points customers to pre-booking. Per-product capacity caps still apply.</p>
+        <label className="mt-4 flex items-center gap-2 text-sm font-medium">
+          <input type="checkbox" name="ordering_open" defaultChecked={orderingOpen} />
+          Accept new orders
+        </label>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <div>
+            <label className="mb-1 block text-sm font-medium">Auto-close after (optional)</label>
+            <input type="date" name="order_cutoff" defaultValue={cutoff} className="w-full rounded-xl border border-line bg-cream px-4 py-2 outline-none focus:border-sage-deep" />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium">Closed message (optional)</label>
+            <input name="closed_message" defaultValue={closedMsg} placeholder="Season orders are closed - pre-book the next batch" className="w-full rounded-xl border border-line bg-cream px-4 py-2 outline-none focus:border-sage-deep" />
+          </div>
+        </div>
+        <button className="btn-primary mt-4 px-5 text-sm">Save</button>
+      </form>
 
       <div className="overflow-hidden rounded-xl2 border border-line bg-white">
         <table className="w-full text-left text-sm">

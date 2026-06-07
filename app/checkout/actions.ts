@@ -6,6 +6,7 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 import { generateReceiptPdf } from "@/lib/receipt";
 import { notifyOwnerOfOrder, notifyCustomerOfOrder } from "@/lib/email";
 import { validateCoupon } from "@/lib/coupons";
+import { getOrderingStatus } from "@/lib/settings";
 
 type PaymentMethod = "razorpay" | "upi" | "cod";
 
@@ -55,6 +56,11 @@ export async function placeOrder(input: Input): Promise<{
   if (!user) return { error: "Please log in to place your order." };
   if (!input.items.length) return { error: "Your cart is empty." };
 
+  const ordering = await getOrderingStatus();
+  if (!ordering.open) {
+    return { error: ordering.message || "We are not taking new orders right now. Please pre-book instead." };
+  }
+
   const ids = input.items.map((i) => i.id);
   const [productsRes, accessoriesRes] = await Promise.all([
     supabaseAdmin.from("products").select("id,name,price,size").in("id", ids),
@@ -88,6 +94,26 @@ export async function placeOrder(input: Input): Promise<{
     })
     .filter((x): x is NonNullable<typeof x> => x !== null);
   if (!orderItems.length) return { error: "No valid items in cart." };
+
+  const capIds = orderItems.map((i) => i.product_id).filter((x): x is string => !!x);
+  if (capIds.length) {
+    const [capsRes, bookedRes] = await Promise.all([
+      supabaseAdmin.from("products").select("id,name,season_capacity").in("id", capIds),
+      supabaseAdmin.from("product_booked").select("product_id,booked").in("product_id", capIds),
+    ]);
+    const capMap = new Map((capsRes.data ?? []).map((p: any) => [p.id, p]));
+    const bookedMap = new Map((bookedRes.data ?? []).map((b: any) => [b.product_id, b.booked as number]));
+    for (const it of orderItems) {
+      if (!it.product_id) continue;
+      const cp: any = capMap.get(it.product_id);
+      if (cp && cp.season_capacity != null) {
+        const remaining = (cp.season_capacity as number) - (bookedMap.get(it.product_id) ?? 0);
+        if (it.qty > remaining) {
+          return { error: remaining <= 0 ? cp.name + " is sold out for this season." : "Only " + remaining + " of " + cp.name + " left this season." };
+        }
+      }
+    }
+  }
 
   const subtotal = orderItems.reduce((s, i) => s + i.price * i.qty, 0);
 
@@ -197,7 +223,7 @@ export async function verifyPayment(input: {
 
   const { error } = await supabaseAdmin
     .from("orders")
-    .update({ status: "paid", razorpay_payment_id: input.razorpay_payment_id })
+    .update({ status: "paid", payment_status: "paid", razorpay_payment_id: input.razorpay_payment_id })
     .eq("id", input.orderId)
     .eq("razorpay_order_id", input.razorpay_order_id);
   if (error) return { error: error.message };
@@ -247,7 +273,7 @@ export async function verifyPayment(input: {
 async function buildAndSaveReceipt(orderId: string) {
   const { data: order, error: oErr } = await supabaseAdmin
     .from("orders")
-    .select("id,customer_name,phone,address,email,city,state,pincode,subtotal,discount,coupon_code,shipping,total,razorpay_payment_id,created_at")
+    .select("id,customer_name,phone,address,email,city,state,pincode,subtotal,discount,coupon_code,shipping,total,razorpay_payment_id,invoice_no,created_at")
     .eq("id", orderId)
     .single();
   if (oErr || !order) throw new Error(oErr?.message || "Order not found");
@@ -258,7 +284,14 @@ async function buildAndSaveReceipt(orderId: string) {
     .eq("order_id", orderId);
   if (iErr) throw new Error(iErr.message);
 
-  const bytes = await generateReceiptPdf(order, items ?? []);
+  let invoiceNo: string | null = (order as any).invoice_no ?? null;
+  try {
+    const { data: assigned } = await supabaseAdmin.rpc("assign_invoice_no", { p_order_id: orderId });
+    if (assigned) invoiceNo = assigned as string;
+  } catch (e) {
+    console.error("assign_invoice_no failed:", e);
+  }
+  const bytes = await generateReceiptPdf({ ...order, invoice_no: invoiceNo } as any, items ?? []);
 
   const path = `${orderId}.pdf`;
   const { error: upErr } = await supabaseAdmin.storage

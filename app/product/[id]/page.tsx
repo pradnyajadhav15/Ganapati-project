@@ -5,6 +5,8 @@ import { getReviews, getRatingSummary } from "@/lib/reviews";
 import { getLocale } from "@/lib/locale";
 import { getDict } from "@/lib/i18n";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
+import { supabaseAdmin } from "@/lib/supabase-admin";
+import { getOrderingStatus } from "@/lib/settings";
 import AddToCartButtons from "@/components/AddToCartButtons";
 import StarRating from "@/components/StarRating";
 import ReviewForm from "@/components/ReviewForm";
@@ -37,6 +39,29 @@ export default async function ProductPage({
     getRatingSummary(product.id),
   ]);
 
+  // Season capacity: how many of this product are still available this season.
+  const { data: capRow } = await supabaseAdmin
+    .from("products")
+    .select("season_capacity")
+    .eq("id", product.id)
+    .maybeSingle();
+  const seasonCap = (capRow?.season_capacity as number | null) ?? null;
+  let remaining: number | null = null;
+  if (seasonCap != null) {
+    const { data: bookedRow } = await supabaseAdmin
+      .from("product_booked")
+      .select("booked")
+      .eq("product_id", product.id)
+      .maybeSingle();
+    remaining = Math.max(0, seasonCap - ((bookedRow?.booked as number) ?? 0));
+  }
+  const capSoldOut = remaining !== null && remaining <= 0;
+  const available = !!product.in_stock && !capSoldOut;
+
+  // Site-wide ordering switch (season cutoff).
+  const ordering = await getOrderingStatus();
+  const canBuy = available && ordering.open;
+
   const sb = createSupabaseServerClient();
   const {
     data: { user },
@@ -65,7 +90,7 @@ export default async function ProductPage({
       "@type": "Offer",
       priceCurrency: "INR",
       price: product.price,
-      availability: product.in_stock
+      availability: available
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
       url: siteUrl + "/product/" + product.id,
@@ -93,7 +118,7 @@ export default async function ProductPage({
             {displayName} {product.size}
           </h1>
 
-          {!product.in_stock && (
+          {!available && (
             <span className="mt-3 inline-block w-fit rounded-full bg-terracotta/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-terracotta">
               {t.soldOut}
             </span>
@@ -115,20 +140,28 @@ export default async function ProductPage({
             <p className="mb-6 max-w-md text-ink-soft">{displayDesc}</p>
           )}
 
-          {product.in_stock ? (
+          {canBuy && remaining !== null && (
+            <p className={"mb-3 text-sm font-medium " + (remaining <= 5 ? "text-terracotta" : "text-ink-soft")}>
+              {remaining <= 5 ? "Only " + remaining + " left this season" : remaining + " available this season"}
+            </p>
+          )}
+
+          {canBuy ? (
             <AddToCartButtons
               variant="page"
               product={{ id: product.id, name: displayName, price: product.price, size: product.size, image_url: product.image_url }}
             />
           ) : (
             <button disabled className="w-full cursor-not-allowed rounded-full bg-cream-deep py-3 text-center font-semibold text-ink-soft">
-              {t.soldOut}
+              {!available ? t.soldOut : "Orders closed for now"}
             </button>
           )}
 
-          <p className="mt-4 text-xs text-ink-soft">
-            {product.in_stock ? t.inStockNote : t.outOfStockNote}
-          </p>
+          {ordering.open ? (
+            <p className="mt-4 text-xs text-ink-soft">{available ? t.inStockNote : t.outOfStockNote}</p>
+          ) : (
+            <p className="mt-4 rounded-lg border border-line bg-cream-deep px-4 py-3 text-sm text-ink-soft">{ordering.message || "We are not taking new orders right now - you can pre-book below for the next batch."}</p>
+          )}
 
           <PreBookForm
             productId={product.id}

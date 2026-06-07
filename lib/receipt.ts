@@ -18,6 +18,7 @@ const STUDIO = {
 
 export type ReceiptOrder = {
   id: string;
+  invoice_no?: string | null;
   customer_name: string | null;
   phone: string | null;
   address: string | null;
@@ -144,7 +145,7 @@ export async function generateReceiptPdf(order: ReceiptOrder, items: ReceiptItem
   if (order.phone) { page.drawText("Phone: " + order.phone, { x: left, y: by, font, size: 9, color: soft }); by -= 12; }
   if (order.email) { page.drawText("Email: " + order.email, { x: left, y: by, font, size: 9, color: soft }); by -= 12; }
 
-  drawRight("RA-" + String(order.id).slice(0, 8).toUpperCase(), right, billTop, bold, 13, ink);
+  drawRight(order.invoice_no || ("RA-" + String(order.id).slice(0, 8).toUpperCase()), right, billTop, bold, 13, ink);
   drawRight(new Date(order.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }), right, billTop - 16, font, 9.5, soft);
   if (order.razorpay_payment_id) drawRight("Paid online", right, billTop - 30, bold, 8.5, green);
 
