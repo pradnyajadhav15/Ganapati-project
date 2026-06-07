@@ -56,23 +56,38 @@ export async function placeOrder(input: Input): Promise<{
   if (!input.items.length) return { error: "Your cart is empty." };
 
   const ids = input.items.map((i) => i.id);
-  const { data: products, error: pErr } = await supabaseAdmin
-    .from("products").select("id,name,price,size").in("id", ids);
-  if (pErr || !products) return { error: "Could not load products." };
+  const [productsRes, accessoriesRes] = await Promise.all([
+    supabaseAdmin.from("products").select("id,name,price,size").in("id", ids),
+    supabaseAdmin.from("accessories").select("id,name,price").in("id", ids),
+  ]);
+  if (productsRes.error || accessoriesRes.error) return { error: "Could not load items." };
 
-  const map = new Map(products.map((p) => [p.id, p]));
+  const productMap = new Map((productsRes.data ?? []).map((p: any) => [p.id, p]));
+  const accessoryMap = new Map((accessoriesRes.data ?? []).map((a: any) => [a.id, a]));
   const orderItems = input.items
-    .filter((i) => map.has(i.id))
     .map((i) => {
-      const p = map.get(i.id)!;
-      return {
-        product_id: p.id,
-        name: p.size ? `${p.name} ${p.size}` : p.name,
-        price: p.price as number,
-        qty: i.qty,
-      };
-    });
-  if (!orderItems.length) return { error: "No valid products in cart." };
+      const p: any = productMap.get(i.id);
+      if (p) {
+        return {
+          product_id: p.id as string | null,
+          name: p.size ? `${p.name} ${p.size}` : p.name,
+          price: p.price as number,
+          qty: i.qty,
+        };
+      }
+      const a: any = accessoryMap.get(i.id);
+      if (a) {
+        return {
+          product_id: null as string | null,
+          name: a.name as string,
+          price: a.price as number,
+          qty: i.qty,
+        };
+      }
+      return null;
+    })
+    .filter((x): x is NonNullable<typeof x> => x !== null);
+  if (!orderItems.length) return { error: "No valid items in cart." };
 
   const subtotal = orderItems.reduce((s, i) => s + i.price * i.qty, 0);
 
@@ -232,7 +247,7 @@ export async function verifyPayment(input: {
 async function buildAndSaveReceipt(orderId: string) {
   const { data: order, error: oErr } = await supabaseAdmin
     .from("orders")
-    .select("id,customer_name,phone,address,subtotal,discount,coupon_code,shipping,total,razorpay_payment_id,created_at")
+    .select("id,customer_name,phone,address,email,city,state,pincode,subtotal,discount,coupon_code,shipping,total,razorpay_payment_id,created_at")
     .eq("id", orderId)
     .single();
   if (oErr || !order) throw new Error(oErr?.message || "Order not found");
@@ -248,10 +263,10 @@ async function buildAndSaveReceipt(orderId: string) {
   const path = `${orderId}.pdf`;
   const { error: upErr } = await supabaseAdmin.storage
     .from("receipts")
-    .upload(path, bytes, { contentType: "application/pdf", upsert: true });
+    .upload(path, bytes, { contentType: "application/pdf", upsert: true, cacheControl: "0" });
   if (upErr) throw new Error(upErr.message);
 
-  const url = supabaseAdmin.storage.from("receipts").getPublicUrl(path).data.publicUrl;
+  const url = supabaseAdmin.storage.from("receipts").getPublicUrl(path).data.publicUrl + "?v=" + Date.now();
 
   await supabaseAdmin.from("orders").update({ receipt_url: url }).eq("id", orderId);
 }

@@ -54,13 +54,7 @@ export default function BookingAdvanceButton({
   if (!link) {
     return (
       <div className="flex flex-col items-start gap-1">
-        <button
-          onClick={create}
-          disabled={loading}
-          className="rounded-lg bg-ink px-3 py-2 text-sm font-semibold text-cream disabled:opacity-60"
-        >
-          {loading ? "Creating link..." : "Create advance-payment link"}
-        </button>
+        <button onClick={create} disabled={loading} className="rounded-lg bg-ink px-3 py-2 text-sm font-semibold text-cream disabled:opacity-60">{loading ? "Creating link..." : "Create advance-payment link"}</button>
         {err && <p className="text-xs text-red-600">{err}</p>}
       </div>
     );
@@ -68,22 +62,8 @@ export default function BookingAdvanceButton({
 
   return (
     <div className="flex flex-col items-start gap-1">
-      
-        href={waHref(link)}
-        target="_blank"
-        rel="noreferrer"
-        className="rounded-lg bg-[#25D366] px-3 py-2 text-sm font-semibold text-white"
-      >
-        Send advance link on WhatsApp
-      </a>
-      
-        href={link}
-        target="_blank"
-        rel="noreferrer"
-        className="text-xs text-sage-deep underline break-all"
-      >
-        {link}
-      </a>
+      <a href={waHref(link)} target="_blank" rel="noreferrer" className="rounded-lg bg-[#25D366] px-3 py-2 text-sm font-semibold text-white">Send advance link on WhatsApp</a>
+      <a href={link} target="_blank" rel="noreferrer" className="text-xs text-sage-deep underline break-all">{link}</a>
     </div>
   );
 }

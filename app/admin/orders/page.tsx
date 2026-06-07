@@ -1,9 +1,10 @@
 ﻿import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { formatINR } from "@/lib/format";
+import OrderRowActions from "@/components/OrderRowActions";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Admin — Orders" };
+export const metadata = { title: "Admin - Orders" };
 
 const statusColor: Record<string, string> = {
   pending: "bg-cream-deep text-ink-soft",
@@ -20,20 +21,28 @@ const methodColor: Record<string, string> = {
   cod: "bg-rose text-ink",
 };
 
-export default async function AdminOrdersPage() {
+export default async function AdminOrdersPage({ searchParams }: { searchParams: { archived?: string } }) {
+  const showArchived = searchParams?.archived === "1";
+
   const { data: orders } = await supabaseAdmin
     .from("orders")
     .select("id,customer_name,phone,total,discount,coupon_code,payment_method,status,razorpay_payment_id,receipt_url,created_at")
+    .eq("archived", showArchived)
     .order("created_at", { ascending: false });
 
   return (
     <section className="site-wrap py-12">
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl">Orders</h1>
-          <p className="text-ink-soft">{orders?.length ?? 0} orders</p>
+          <h1 className="text-3xl">{showArchived ? "Archived orders" : "Orders"}</h1>
+          <p className="text-ink-soft">{orders?.length ?? 0} {showArchived ? "archived" : "orders"}</p>
         </div>
         <div className="flex gap-3">
+          {showArchived ? (
+            <Link href="/admin/orders" className="btn-ghost">Active orders</Link>
+          ) : (
+            <Link href="/admin/orders?archived=1" className="btn-ghost">Archived</Link>
+          )}
           <Link href="/admin" className="btn-ghost">Products</Link>
         </div>
       </div>
@@ -56,40 +65,32 @@ export default async function AdminOrdersPage() {
               <tr key={o.id} className="border-t border-line">
                 <td className="p-4 font-mono text-xs">#{String(o.id).slice(0, 8).toUpperCase()}</td>
                 <td className="p-4">
-                  <div className="font-medium">{o.customer_name || "—"}</div>
+                  <div className="font-medium">{o.customer_name || "-"}</div>
                   <div className="text-xs text-ink-soft">{o.phone || ""}</div>
                 </td>
                 <td className="p-4 text-ink-soft">
-                  {new Date(o.created_at as string).toLocaleDateString("en-IN", {
-                    day: "2-digit", month: "short", year: "numeric",
-                  })}
+                  {new Date(o.created_at as string).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
                 </td>
                 <td className="p-4">
                   {formatINR(o.total as number)}
                   {(o.discount as number) > 0 && (
-                    <div className="text-[11px] font-normal text-sage-deep">
-                      {o.coupon_code as string} (-{formatINR(o.discount as number)})
-                    </div>
+                    <div className="text-[11px] font-normal text-sage-deep">{o.coupon_code as string} (-{formatINR(o.discount as number)})</div>
                   )}
                 </td>
                 <td className="p-4">
-                  <span className={`rounded-full px-2.5 py-1 text-xs ${methodColor[o.payment_method as string] ?? "bg-cream-deep text-ink-soft"}`}>
-                    {methodLabel[o.payment_method as string] ?? "—"}
-                  </span>
+                  <span className={`rounded-full px-2.5 py-1 text-xs ${methodColor[o.payment_method as string] ?? "bg-cream-deep text-ink-soft"}`}>{methodLabel[o.payment_method as string] ?? "-"}</span>
                 </td>
                 <td className="p-4">
-                  <span className={`rounded-full px-2.5 py-1 text-xs capitalize ${statusColor[o.status as string] ?? "bg-cream-deep text-ink-soft"}`}>
-                    {o.status}
-                  </span>
+                  <span className={`rounded-full px-2.5 py-1 text-xs capitalize ${statusColor[o.status as string] ?? "bg-cream-deep text-ink-soft"}`}>{o.status}</span>
                 </td>
                 <td className="p-4 text-right">
-                  <Link href={`/admin/orders/${o.id}`} className="text-sage-deep underline">View</Link>
+                  <OrderRowActions id={o.id as string} archived={showArchived} />
                 </td>
               </tr>
             ))}
             {(!orders || orders.length === 0) && (
               <tr>
-                <td colSpan={7} className="p-8 text-center text-ink-soft">No orders yet.</td>
+                <td colSpan={7} className="p-8 text-center text-ink-soft">{showArchived ? "No archived orders." : "No orders yet."}</td>
               </tr>
             )}
           </tbody>

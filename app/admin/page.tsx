@@ -23,6 +23,9 @@ export default async function AdminPage() {
           <Link href="/admin/bookings" className="btn-ghost">
             Pre-bookings
           </Link>
+          <Link href="/admin/messages" className="btn-ghost">
+            Messages
+          </Link>
           <Link href="/admin/subscribers" className="btn-ghost">
             Subscribers
           </Link>
@@ -35,7 +38,10 @@ export default async function AdminPage() {
            <Link href="/admin/coupons" className="btn-ghost">
             Coupons
           </Link>
-            <Link href="/admin/gallery" className="btn-ghost">
+            <Link href="/admin/team" className="btn-ghost">
+            Team
+          </Link>
+          <Link href="/admin/gallery" className="btn-ghost">
             Gallery
           </Link>
           <Link href="/admin/products/new" className="btn-primary">

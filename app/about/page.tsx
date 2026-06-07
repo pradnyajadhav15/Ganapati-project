@@ -1,18 +1,27 @@
-import PageHero from "@/components/PageHero";
+﻿import PageHero from "@/components/PageHero";
 import Image from "next/image";
 import { getLocale } from "@/lib/locale";
 import { getDict, type Dict } from "@/lib/i18n";
+import { getTeamMembers } from "@/lib/team";
 
 export const metadata = { title: "About Us - R. Ramesh Arts Studio" };
 
 const team = [
   { name: "Mr. Ramesh Raichurkar", roleKey: "roleFounder", bioKey: "bioRamesh", image: "/images/team/ramesh.jpg" },
   { name: "Mr. Suhas Raichurkar", roleKey: "roleCoFounder", bioKey: "bioSuhas", image: "/images/team/cofounder.jpg" },
-  { name: "Mr. Amar Jakkan", roleKey: "roleStudioManager", bioKey: "bioAmar", image: "/images/team/manager.jpg" },
 ] as const;
 
-export default function Page() {
-  const t = getDict(getLocale());
+const teamHeading: Record<string, { kicker: string; title: string }> = {
+  en: { kicker: "Our Craftspeople", title: "The Hands Behind Every Idol" },
+  hi: { kicker: "हमारे कारीगर", title: "हर मूर्ति के पीछे के कुशल हाथ" },
+  mr: { kicker: "आमचे कारागीर", title: "प्रत्येक मूर्तीमागचे कुशल हात" },
+};
+
+export default async function Page() {
+  const locale = getLocale();
+  const t = getDict(locale);
+  const members = await getTeamMembers();
+  const th = teamHeading[locale] ?? teamHeading.en;
 
   return (
     <>
@@ -36,9 +45,9 @@ export default function Page() {
             <div className="kicker mb-3">{t.peopleBehindClay}</div>
             <h2 className="text-[clamp(2rem,3.5vw,2.9rem)]">{t.meetOurTeam}</h2>
           </div>
-          <div className="grid gap-8 md:grid-cols-3">
+          <div className="flex flex-wrap justify-center gap-x-16 gap-y-10">
             {team.map((m) => (
-              <div key={m.roleKey} className="text-center">
+              <div key={m.roleKey} className="w-[260px] text-center">
                 <div className="relative mx-auto mb-4 h-[150px] w-[150px] overflow-hidden rounded-full border-4 border-white shadow-soft">
                   <Image src={m.image} alt={m.name} fill className="object-cover" />
                 </div>
@@ -50,6 +59,24 @@ export default function Page() {
           </div>
         </div>
       </section>
+
+      {members.length > 0 && (
+        <section className="site-wrap py-[80px]">
+          <div className="mb-12 text-center">
+            <div className="kicker mb-3">{th.kicker}</div>
+            <h2 className="text-[clamp(2rem,3.5vw,2.9rem)]">{th.title}</h2>
+          </div>
+          <div className="mx-auto max-w-xl divide-y divide-line">
+            {members.map((m, i) => (
+              <div key={m.id} className="flex items-baseline gap-5 py-4">
+                <span className="w-7 font-display text-sm text-gold">{String(i + 1).padStart(2, "0")}</span>
+                <span className="font-display text-xl text-ink">{m.name}</span>
+                {m.role && <span className="ml-auto text-[0.72rem] uppercase tracking-[0.16em] text-gold">{m.role}</span>}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="site-wrap py-[80px] text-center">
         <blockquote className="mx-auto max-w-2xl font-display text-xl italic text-ink-soft">
