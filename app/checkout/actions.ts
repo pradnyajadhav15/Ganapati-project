@@ -24,7 +24,8 @@ type Input = {
   couponCode?: string;
 };
 
-const SHIPPING_OUTSIDE = 100;
+const SHIPPING_OUTSIDE_IDOL = 500;
+const SHIPPING_OUTSIDE_ACCESSORY = 100;
 
 export async function previewCoupon(input: {
   items: { id: string; qty: number }[];
@@ -126,7 +127,8 @@ export async function placeOrder(input: Input): Promise<{
     couponCode = res.code;
   }
 
-  const shipping = input.deliveryArea === "outside" ? SHIPPING_OUTSIDE : 0;
+  const hasIdol = orderItems.some((i) => i.product_id != null);
+  const shipping = input.deliveryArea === "outside" ? (hasIdol ? SHIPPING_OUTSIDE_IDOL : SHIPPING_OUTSIDE_ACCESSORY) : 0;
   const finalTotal = Math.max(0, subtotal - discount + shipping);
 
   const { data: order, error: oErr } = await supabaseAdmin

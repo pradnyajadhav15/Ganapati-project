@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/CartProvider";
@@ -10,6 +10,7 @@ type ButtonProduct = {
   price: number;
   size: string | null;
   image_url: string | null;
+  kind?: "product" | "accessory";
 };
 
 export default function AddToCartButtons({

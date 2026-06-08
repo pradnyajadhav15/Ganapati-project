@@ -106,8 +106,8 @@ export default async function Home() {
             </div>
           </div>
 
-          <div className="reveal relative grid aspect-[4/5] place-items-center overflow-hidden rounded-[200px_200px_24px_24px] bg-gradient-to-br from-peach to-rose shadow-soft [animation-delay:.15s]">
-            <div className="absolute inset-[18px] rounded-[190px_190px_16px_16px] border-2 border-dashed border-white/60" />
+          <div className="reveal relative grid aspect-[4/5] place-items-center overflow-hidden rounded-[180px_24px_180px_24px] bg-gradient-to-br from-peach to-rose shadow-soft [animation-delay:.15s]">
+            <div className="absolute inset-[18px] rounded-[168px_18px_168px_18px] border-2 border-dashed border-white/60" />
             <Image src="/images/hero-idol.jpg" alt="Handcrafted Ganesha idol" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" priority />
           </div>
         </div>

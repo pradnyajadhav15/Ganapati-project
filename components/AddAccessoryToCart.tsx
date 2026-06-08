@@ -19,7 +19,7 @@ export default function AddAccessoryToCart({
   const [added, setAdded] = useState(false);
 
   function handleAdd() {
-    add({ id, name, price, size: null, image_url }, 1);
+    add({ id, name, price, size: null, image_url, kind: "accessory" }, 1);
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   }

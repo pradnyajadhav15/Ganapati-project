@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   createContext,
@@ -14,6 +14,7 @@ export type CartItem = {
   price: number;
   size: string | null;
   image_url: string | null;
+  kind?: "product" | "accessory";
   qty: number;
 };
 

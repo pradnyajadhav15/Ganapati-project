@@ -85,7 +85,9 @@ export default function CheckoutForm({ defaultName }: { defaultName: string }) {
     );
   }
 
-  const shipping = deliveryArea === "outside" ? 100 : 0;
+  const accessoriesOnly = items.length > 0 && items.every((i) => i.kind === "accessory");
+  const outsideShipping = accessoriesOnly ? 100 : 500;
+  const shipping = deliveryArea === "outside" ? outsideShipping : 0;
   const payable = Math.max(0, total - discount + shipping);
 
   async function applyCoupon() {
@@ -204,10 +206,10 @@ export default function CheckoutForm({ defaultName }: { defaultName: string }) {
                   <input type="radio" name="delivery" checked={deliveryArea === "outside"} onChange={() => setDeliveryArea("outside")} />
                   <span className="text-sm">
                     <span className="font-medium">Outside Solapur</span>
-                    <span className="block text-xs text-ink-soft">Shipped to your address</span>
+                    <span className="block text-xs text-ink-soft">Box packing, travel and delivery to your address</span>
                   </span>
                 </span>
-                <span className="text-sm font-semibold">{formatINR(100)}</span>
+                <span className="text-sm font-semibold">{formatINR(outsideShipping)}</span>
               </label>
             </div>
           </div>
