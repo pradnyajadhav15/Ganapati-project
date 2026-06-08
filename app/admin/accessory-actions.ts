@@ -36,12 +36,19 @@ export async function createAccessory(formData: FormData) {
     image_url = await uploadAccessoryImage(file);
   }
 
+  const extraFiles = (formData.getAll("images") as File[]).filter((f) => f && f.size > 0);
+  const image_urls: string[] = [];
+  for (const f of extraFiles) {
+    image_urls.push(await uploadAccessoryImage(f));
+  }
+
   const { error } = await supabaseAdmin.from("accessories").insert({
     name,
     subtitle,
     price,
     sort_order,
     image_url,
+    image_urls,
     visible: true,
   });
   if (error) throw new Error(error.message);
@@ -66,6 +73,24 @@ export async function updateAccessory(formData: FormData) {
   const file = formData.get("image") as File | null;
   if (file && file.size > 0) {
     updates.image_url = await uploadAccessoryImage(file);
+  }
+
+  const clearExtra = formData.get("clear_images") === "on";
+  const extraFiles = (formData.getAll("images") as File[]).filter((f) => f && f.size > 0);
+  if (clearExtra || extraFiles.length) {
+    let gallery: string[] = [];
+    if (!clearExtra) {
+      const { data: existing } = await supabaseAdmin
+        .from("accessories")
+        .select("image_urls")
+        .eq("id", id)
+        .single();
+      gallery = (existing?.image_urls as string[]) ?? [];
+    }
+    for (const f of extraFiles) {
+      gallery.push(await uploadAccessoryImage(f));
+    }
+    updates.image_urls = gallery;
   }
 
   const { error } = await supabaseAdmin.from("accessories").update(updates).eq("id", id);

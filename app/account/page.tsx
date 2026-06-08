@@ -41,6 +41,7 @@ export default async function AccountPage() {
   const { data: orders } = await supabase
     .from("orders")
     .select("id,total,invoice_no,progress_status,created_at,receipt_url")
+    .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
   return (

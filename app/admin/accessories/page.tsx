@@ -18,6 +18,7 @@ type Accessory = {
   subtitle: string | null;
   price: number;
   image_url: string | null;
+  image_urls: string[] | null;
   sort_order: number;
   visible: boolean;
 };
@@ -32,7 +33,7 @@ export default async function AdminAccessoriesPage() {
 
   const { data } = await supabaseAdmin
     .from("accessories")
-    .select("id,name,subtitle,price,image_url,sort_order,visible")
+    .select("id,name,subtitle,price,image_url,sort_order,visible,image_urls")
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true });
 
@@ -72,6 +73,10 @@ export default async function AdminAccessoriesPage() {
           <label className="text-sm md:col-span-2">
             Photo
             <input name="image" type="file" accept="image/*" className={inputClass} />
+          </label>
+          <label className="text-sm md:col-span-2">
+            Additional photos (optional)
+            <input name="images" type="file" accept="image/*" multiple className={inputClass} />
           </label>
           <div className="md:col-span-2">
             <button type="submit" className="btn-primary">Add accessory</button>
@@ -118,6 +123,22 @@ export default async function AdminAccessoriesPage() {
                     Replace photo (leave empty to keep current)
                     <input name="image" type="file" accept="image/*" className={inputClass} />
                   </label>
+                  <div className="text-sm md:col-span-2">
+                    Additional photos
+                    {a.image_urls && a.image_urls.length > 0 ? (
+                      <div className="mb-2 mt-1 flex flex-wrap gap-2">
+                        {a.image_urls.map((src, i) => (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img key={i} src={src} alt={a.name + " " + (i + 1)} className="h-16 w-16 rounded-lg border border-line object-cover" />
+                        ))}
+                      </div>
+                    ) : null}
+                    <input name="images" type="file" accept="image/*" multiple className={inputClass} />
+                    <label className="mt-2 flex items-center gap-2 text-xs text-ink-soft">
+                      <input type="checkbox" name="clear_images" />
+                      Remove existing extra photos before adding new ones
+                    </label>
+                  </div>
                   <label className="flex items-center gap-2 text-sm md:col-span-2">
                     <input type="checkbox" name="visible" defaultChecked={a.visible} />
                     Visible on homepage

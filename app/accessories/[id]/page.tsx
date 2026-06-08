@@ -1,27 +1,25 @@
-﻿import Image from "next/image";
-import { notFound } from "next/navigation";
+﻿import { notFound } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { formatINR } from "@/lib/format";
 import AddAccessoryToCart from "@/components/AddAccessoryToCart";
+import ProductGallery from "@/components/ProductGallery";
 
 export const dynamic = "force-dynamic";
 
 export default async function AccessoryDetailPage({ params }: { params: { id: string } }) {
   const { data: a } = await supabaseAdmin
     .from("accessories")
-    .select("id,name,subtitle,price,image_url,visible")
+    .select("id,name,subtitle,price,image_url,image_urls,visible")
     .eq("id", params.id)
     .single();
   if (!a || a.visible === false) notFound();
 
+  const galleryImages = [a.image_url, ...((a.image_urls as string[] | null) ?? [])].filter(Boolean) as string[];
+
   return (
     <section className="site-wrap py-12">
       <div className="grid gap-10 md:grid-cols-2">
-        <div className="relative aspect-square overflow-hidden rounded-xl2 border border-line bg-[#faf9f7]">
-          {a.image_url ? (
-            <Image src={a.image_url} alt={a.name} fill className="object-contain p-8" sizes="(max-width: 768px) 100vw, 50vw" priority />
-          ) : null}
-        </div>
+        <ProductGallery images={galleryImages} alt={a.name} name={a.name} price={a.price} />
         <div className="flex flex-col">
           <div className="text-[0.72rem] uppercase tracking-[0.3em] text-sage-deep">Ganpati Shastra</div>
           <h1 className="mt-2 text-3xl">{a.name}</h1>

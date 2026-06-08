@@ -49,11 +49,42 @@ const features = [
   },
 ] as const;
 
+const HERITAGE: Record<string, { kicker: string; title: string; p1: string; p2: string; cta: string; estLabel: string; caption: string }> = {
+  en: {
+    kicker: "Our Heritage",
+    title: "Crafted in Solapur, Blessed by Tradition",
+    p1: "R. Ramesh Arts has been creating sacred idols for over two decades, rooted in the rich artistic heritage of Solapur. Each idol is hand-crafted by skilled artisans using traditional techniques passed down through generations — from delicate Shadu Mati clay work to precision fibre craft.",
+    p2: "Our city is home to the revered Aajoba Ganapati of Shukrawar Peth — established in 1885 and counted among the oldest sarvajanik (public) Ganesh festivals in India, a tradition older than the public Ganeshotsav movement itself. This 'Manacha' Ganpati is the timeless pride of Solapur, and its devotion inspires every murti we make.",
+    cta: "Read Our Story",
+    estLabel: "Est.",
+    caption: "Aajoba Ganapati — Pride of Solapur",
+  },
+  hi: {
+    kicker: "हमारी विरासत",
+    title: "सोलापुर में निर्मित, परंपरा से धन्य",
+    p1: "R. Ramesh Arts दो दशकों से अधिक समय से पवित्र मूर्तियाँ बना रहा है, जो सोलापुर की समृद्ध कलात्मक विरासत में निहित है। हर मूर्ति कुशल कारीगरों द्वारा पीढ़ियों से चली आ रही पारंपरिक तकनीकों से हाथ से बनाई जाती है — नाज़ुक शाडू माटी के काम से लेकर बारीक फाइबर शिल्प तक।",
+    p2: "हमारा शहर श्रद्धेय आजोबा गणपती का निवास है — शुक्रवार पेठ में 1885 में स्थापित और भारत के सबसे पुराने सार्वजनिक गणेशोत्सवों में गिना जाने वाला, जो सार्वजनिक गणेशोत्सव परंपरा से भी पुराना है। यह 'मानाचा' गणपती सोलापुर का चिरंतन गौरव है, और इसकी भक्ति हमारी हर मूर्ति को प्रेरित करती है।",
+    cta: "हमारी कहानी पढ़ें",
+    estLabel: "स्थापना",
+    caption: "आजोबा गणपती — सोलापुर का गौरव",
+  },
+  mr: {
+    kicker: "आमचा वारसा",
+    title: "सोलापुरात घडवलेले, परंपरेने पावन",
+    p1: "R. Ramesh Arts दोन दशकांहून अधिक काळ पवित्र मूर्ती घडवत आहे, सोलापूरच्या समृद्ध कलात्मक वारशात रुजलेले. प्रत्येक मूर्ती कुशल कारागिरांकडून पिढ्यान्‌पिढ्या चालत आलेल्या पारंपरिक तंत्रांनी हाताने घडवली जाते — नाजूक शाडू मातीच्या कामापासून ते सूक्ष्म फायबर कलेपर्यंत.",
+    p2: "आमचे शहर श्रद्धेय आजोबा गणपतीचे निवासस्थान आहे — शुक्रवार पेठेत 1885 मध्ये स्थापन झालेला आणि भारतातील सर्वात जुन्या सार्वजनिक गणेशोत्सवांपैकी एक, सार्वजनिक गणेशोत्सव परंपरेहूनही जुना. हा 'मानाचा' गणपती सोलापूरचा चिरंतन अभिमान आहे, आणि त्याची भक्ती आमच्या प्रत्येक मूर्तीला प्रेरणा देते.",
+    cta: "आमची कथा वाचा",
+    estLabel: "स्थापना",
+    caption: "आजोबा गणपती — सोलापूरचा अभिमान",
+  },
+};
+
 export default async function Home() {
   const products = await getProducts();
   const accessories = await getAccessories();
   const locale = getLocale();
   const t = getDict(locale);
+  const h = HERITAGE[locale] ?? HERITAGE.en;
 
   return (
     <>
@@ -92,6 +123,32 @@ export default async function Home() {
         </div>
         <div className="mt-10 text-center">
           <Link href="/shop" className="btn-ghost">{t.viewAll}</Link>
+        </div>
+      </section>
+
+      {/* HERITAGE */}
+      <section className="bg-[radial-gradient(900px_500px_at_85%_30%,rgba(242,201,168,.35),transparent_60%)] py-[90px]">
+        <div className="site-wrap grid items-center gap-12 md:grid-cols-[0.82fr_1.18fr]">
+          <div>
+            <span className="inline-block rounded-full bg-terracotta/10 px-4 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-terracotta">{h.kicker}</span>
+            <h2 className="mt-5 text-[clamp(2rem,4vw,3.2rem)] leading-[1.05]">{h.title}</h2>
+            <p className="mt-6 max-w-md text-ink-soft">{h.p1}</p>
+            <p className="mt-4 max-w-md text-ink-soft">{h.p2}</p>
+            <Link href="/about" className="btn-primary mt-8 inline-block">{h.cta}</Link>
+          </div>
+
+          <div className="mx-auto w-full max-w-sm">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-xl2 border border-line shadow-soft">
+              <Image src="/images/aajoba-ganapati.jpg" alt="Aajoba Ganapati - Pride of Solapur" fill sizes="(max-width: 500px) 100vw, 55vw" className="object-cover" />
+            </div>
+            <div className="relative z-10 -mt-14 ml-auto mr-3 grid h-28 w-28 place-items-center rounded-full bg-terracotta text-center text-white shadow-soft">
+              <div>
+                <div className="text-[0.62rem] uppercase tracking-[0.18em] opacity-90">{h.estLabel}</div>
+                <div className="font-display text-2xl leading-none">2002</div>
+              </div>
+            </div>
+            <p className="mt-4 text-center text-sm font-medium text-ink-soft">{h.caption}</p>
+          </div>
         </div>
       </section>
 
