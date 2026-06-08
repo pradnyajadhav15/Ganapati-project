@@ -1,4 +1,4 @@
-import PageHero from "@/components/PageHero";
+﻿import PageHero from "@/components/PageHero";
 
 export const metadata = { title: "Shipping Policy - R. Ramesh Arts Studio" };
 
@@ -9,6 +9,21 @@ export default function Page() {
       <section className="site-wrap py-[80px]">
         <div className="mx-auto max-w-3xl space-y-6 text-ink-soft">
           <p>We ship handcrafted Ganpati idols across India, packed with extra care to protect every detail.</p>
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div className="rounded-xl2 border border-line bg-white p-6">
+              <span className="inline-block rounded-full bg-sage/20 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-sage-deep">International / Outstation</span>
+              <h3 className="mt-3 font-display text-xl text-ink">Travel-Safe Packing</h3>
+              <p className="mt-2 text-sm">We carefully pack your idol for safe travel by air, road, or rail — to anywhere in India and for devotees travelling abroad. Please call us before booking so we can plan the safest packing for the journey.</p>
+              <a href="https://wa.me/917020290393" target="_blank" rel="noreferrer" className="btn-primary mt-4 inline-block text-sm">Enquire on WhatsApp</a>
+            </div>
+            <div className="rounded-xl2 border border-line bg-white p-6">
+              <span className="inline-block rounded-full bg-peach px-3 py-1 text-xs font-semibold uppercase tracking-wider text-terracotta">Local Solapur Families</span>
+              <h3 className="mt-3 font-display text-xl text-ink">Delivered or Picked Up</h3>
+              <p className="mt-2 text-sm">For Solapur and nearby, choose 100% safe home delivery, or pick up your idol directly from our studio — whichever feels right for you.</p>
+              <a href="https://wa.me/917020290393" target="_blank" rel="noreferrer" className="btn-primary mt-4 inline-block text-sm">Enquire on WhatsApp</a>
+            </div>
+          </div>
 
           <h2 className="font-display text-2xl text-ink">Processing Time</h2>
           <p>Ready-stock orders are dispatched within 2 to 3 business days. Custom orders take longer depending on the design and size, and a timeline is shared at the time of order.</p>

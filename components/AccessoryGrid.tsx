@@ -13,7 +13,7 @@ type Accessory = {
 export default function AccessoryGrid({ accessories }: { accessories: Accessory[] }) {
   if (!accessories.length) return null;
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-5">
       {accessories.map((a) => (
         <Link key={a.id} href={"/accessories/" + a.id} className="group block overflow-hidden rounded-xl2 border border-line bg-white transition hover:shadow-soft">
           <div className="relative aspect-square overflow-hidden bg-[#faf9f7]">

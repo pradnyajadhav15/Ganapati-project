@@ -113,6 +113,33 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* STATS */}
+      <section className="border-y border-line bg-cream-deep">
+        <div className="site-wrap grid gap-8 py-10 sm:grid-cols-3">
+          <div className="flex items-center justify-center gap-3">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-9 w-9 shrink-0 text-terracotta"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+            <div>
+              <div className="font-display text-3xl leading-none text-ink">5,000+</div>
+              <div className="mt-1 text-sm text-ink-soft">Safe idol deliveries</div>
+            </div>
+          </div>
+          <div className="flex items-center justify-center gap-3">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-9 w-9 shrink-0 text-terracotta"><circle cx="12" cy="8" r="6" /><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" /></svg>
+            <div>
+              <div className="font-display text-3xl leading-none text-ink">20+ years</div>
+              <div className="mt-1 text-sm text-ink-soft">of trusted service</div>
+            </div>
+          </div>
+          <div className="flex items-center justify-center gap-3">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-9 w-9 shrink-0 text-terracotta"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" /><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" /><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" /></svg>
+            <div>
+              <div className="font-display text-base leading-tight text-ink">100% Handcrafted</div>
+              <div className="mt-1 text-sm text-ink-soft">By skilled Solapur artisans</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* FEATURED */}
       <section className="site-wrap py-[90px]">
         <SectionHeading kicker={t.ourCollections} title={t.featuredMurtis} sub={t.featuredSub} />
@@ -123,6 +150,79 @@ export default async function Home() {
         </div>
         <div className="mt-10 text-center">
           <Link href="/shop" className="btn-ghost">{t.viewAll}</Link>
+        </div>
+      </section>
+
+            {/* GANPATI SHASTRA */}
+      {accessories.length > 0 && (
+        <section className="bg-cream-deep py-[90px]">
+          <div className="site-wrap">
+            <SectionHeading kicker={t.toolsAccessories} title={t.ganpatiShastra} sub={t.shastraSub} />
+            <AccessoryGrid accessories={accessories.slice(0, 5)} />
+            <div className="mt-10 flex flex-wrap justify-center gap-3">
+              <Link href="/collections/accessories" className="btn-ghost">{t.viewAll}</Link>
+              <a href="https://wa.me/917020290393" target="_blank" rel="noreferrer" className="btn-primary">{t.enquireWhatsApp}</a>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* VISIT STUDIO */}
+      <section className="bg-cream py-[90px]">
+        <div className="site-wrap">
+          <SectionHeading kicker="Visit Us" title="Visit Our Solapur Studio" sub="See it, check it, and choose with confidence — every doubt cleared in person." />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            <Link href="/contact" className="group flex flex-col overflow-hidden rounded-xl2 shadow-soft">
+              <div className="relative aspect-square w-full overflow-hidden bg-cream-deep">
+                <img src="/images/studio-open.jpg" alt="Open all year round" className="h-full w-full object-cover" />
+              </div>
+              <div className="flex flex-1 flex-col bg-gold p-5">
+                <h3 className="font-display text-base font-semibold leading-snug text-ink">Open All Year Round</h3>
+                <p className="mt-2 text-sm text-ink-soft">Drop by any day — our Solapur workshop stays open through the year, so you can plan your visit without worry.</p>
+                <span className="mt-auto inline-flex h-9 w-9 items-center justify-center self-start rounded-full border border-ink/40 text-lg text-ink transition group-hover:bg-ink group-hover:text-white">→</span>
+              </div>
+            </Link>
+            <Link href="/contact" className="group flex flex-col overflow-hidden rounded-xl2 shadow-soft">
+              <div className="relative aspect-square w-full overflow-hidden bg-cream-deep">
+                <img src="/images/studio-quality.jpg" alt="Check strength and finish" className="h-full w-full object-cover" />
+              </div>
+              <div className="flex flex-1 flex-col bg-sage p-5">
+                <h3 className="font-display text-base font-semibold leading-snug text-ink">Check Strength and Finish Yourself</h3>
+                <p className="mt-2 text-sm text-ink-soft">Lift it, look closely, feel the finish — judge the quality with your own hands before you decide.</p>
+                <span className="mt-auto inline-flex h-9 w-9 items-center justify-center self-start rounded-full border border-ink/40 text-lg text-ink transition group-hover:bg-ink group-hover:text-white">→</span>
+              </div>
+            </Link>
+            <Link href="/contact" className="group flex flex-col overflow-hidden rounded-xl2 shadow-soft">
+              <div className="relative aspect-square w-full overflow-hidden bg-cream-deep">
+                <img src="/images/studio-material.jpg" alt="Pick the right material" className="h-full w-full object-cover" />
+              </div>
+              <div className="flex flex-1 flex-col bg-gold p-5">
+                <h3 className="font-display text-base font-semibold leading-snug text-ink">Pick the Right Material</h3>
+                <p className="mt-2 text-sm text-ink-soft">Understand POP, fibre and Shadu Mati so you can choose the idol that suits your home and budget.</p>
+                <span className="mt-auto inline-flex h-9 w-9 items-center justify-center self-start rounded-full border border-ink/40 text-lg text-ink transition group-hover:bg-ink group-hover:text-white">→</span>
+              </div>
+            </Link>
+            <Link href="/contact" className="group flex flex-col overflow-hidden rounded-xl2 shadow-soft">
+              <div className="relative aspect-square w-full overflow-hidden bg-cream-deep">
+                <img src="/images/studio-care.jpg" alt="Care and handling guidance" className="h-full w-full object-cover" />
+              </div>
+              <div className="flex flex-1 flex-col bg-sage p-5">
+                <h3 className="font-display text-base font-semibold leading-snug text-ink">Guidance on Care and Handling</h3>
+                <p className="mt-2 text-sm text-ink-soft">Learn how to carry, place and look after your idol safely, right up to visarjan — without cracks.</p>
+                <span className="mt-auto inline-flex h-9 w-9 items-center justify-center self-start rounded-full border border-ink/40 text-lg text-ink transition group-hover:bg-ink group-hover:text-white">→</span>
+              </div>
+            </Link>
+            <Link href="/contact" className="group flex flex-col overflow-hidden rounded-xl2 shadow-soft">
+              <div className="relative aspect-square w-full overflow-hidden bg-cream-deep">
+                <img src="/images/studio-real.jpg" alt="Real idols, no edited photos" className="h-full w-full object-cover" />
+              </div>
+              <div className="flex flex-1 flex-col bg-gold p-5">
+                <h3 className="font-display text-base font-semibold leading-snug text-ink">Real Idols, No Edited Photos</h3>
+                <p className="mt-2 text-sm text-ink-soft">What you see in our studio is exactly what you take home — genuine idols, no surprises.</p>
+                <span className="mt-auto inline-flex h-9 w-9 items-center justify-center self-start rounded-full border border-ink/40 text-lg text-ink transition group-hover:bg-ink group-hover:text-white">→</span>
+              </div>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -152,19 +252,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* GANPATI SHASTRA */}
-      {accessories.length > 0 && (
-        <section className="bg-cream-deep py-[90px]">
-          <div className="site-wrap">
-            <SectionHeading kicker={t.toolsAccessories} title={t.ganpatiShastra} sub={t.shastraSub} />
-            <AccessoryGrid accessories={accessories.slice(0, 5)} />
-            <div className="mt-10 flex flex-wrap justify-center gap-3">
-              <Link href="/collections/accessories" className="btn-ghost">{t.viewAll}</Link>
-              <a href="https://wa.me/917020290393" target="_blank" rel="noreferrer" className="btn-primary">{t.enquireWhatsApp}</a>
-            </div>
-          </div>
-        </section>
-      )}
+
 
       <Testimonials />
 
