@@ -4,7 +4,7 @@ import { getProducts } from "@/lib/products";
 const base = "https://www.rramesharts.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const staticÐ aths = [
+  const staticPaths = [
     "",
     "/collections",
     "/collections/dashboard-idols",
@@ -23,7 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/shipping-policy",
   ];
 
-  const staticRoutes: MetadataRoute.Sitemap = staticÐ aths.map((path) => ({
+  const staticRoutes: MetadataRoute.Sitemap = staticPaths.map((path) => ({
     url: base + path,
     lastModified: new Date(),
   }));
