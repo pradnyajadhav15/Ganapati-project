@@ -31,33 +31,39 @@ const progColor: Record<string, string> = { new: "bg-peach text-ink", confirmed:
 function buildNotices(locale: string, firstName: string, shortId: string) {
   const f = firstName;
   const id = shortId;
-  const M: Record<string, { cLabel: string; oLabel: string; dLabel: string; subject: string; confirmed: string; out: string; delivered: string }> = {
+  const M: Record<string, { cLabel: string; oLabel: string; dLabel: string; xLabel: string; subject: string; confirmed: string; out: string; delivered: string; cancelled: string }> = {
     en: {
       cLabel: "Order confirmed",
       oLabel: "Out for delivery",
       dLabel: "Delivered",
-      subject: "Update on your order #" + id,
-      confirmed: "Hi " + f + ", your order #" + id + " with R. Ramesh Arts Studio is confirmed and we have started preparing it. Thank you!",
-      out: "Hi " + f + ", your order #" + id + " is out for delivery today. Please keep your phone reachable.",
-      delivered: "Hi " + f + ", your order #" + id + " has been delivered. Thank you for choosing R. Ramesh Arts Studio!",
+      xLabel: "Cancelled",
+      subject: "Update on your order " + id,
+      confirmed: "Hi " + f + ", your order " + id + " with R. Ramesh Arts Studio is confirmed and we have started preparing it. Thank you!",
+      out: "Hi " + f + ", your order " + id + " is out for delivery today. Please keep your phone reachable.",
+      delivered: "Hi " + f + ", your order " + id + " has been delivered. Thank you for choosing R. Ramesh Arts Studio!",
+      cancelled: "Hi " + f + ", your order " + id + " with R. Ramesh Arts Studio has been cancelled. If this was not expected or you have any questions, please reply here and we will be glad to help.",
     },
     hi: {
       cLabel: "ऑर्डर पुष्ट",
       oLabel: "डिलीवरी के लिए रवाना",
       dLabel: "डिलीवर हो गया",
-      subject: "आपके ऑर्डर #" + id + " की जानकारी",
-      confirmed: "नमस्ते " + f + ", R. Ramesh Arts Studio में आपका ऑर्डर #" + id + " पुष्ट हो गया है और हमने उसे तैयार करना शुरू कर दिया है। धन्यवाद!",
-      out: "नमस्ते " + f + ", आपका ऑर्डर #" + id + " आज डिलीवरी के लिए निकल गया है। कृपया अपना फ़ोन चालू रखें।",
-      delivered: "नमस्ते " + f + ", आपका ऑर्डर #" + id + " डिलीवर कर दिया गया है। R. Ramesh Arts Studio चुनने के लिए धन्यवाद!",
+      xLabel: "रद्द",
+      subject: "आपके ऑर्डर " + id + " की जानकारी",
+      confirmed: "नमस्ते " + f + ", R. Ramesh Arts Studio में आपका ऑर्डर " + id + " पुष्ट हो गया है और हमने उसे तैयार करना शुरू कर दिया है। धन्यवाद!",
+      out: "नमस्ते " + f + ", आपका ऑर्डर " + id + " आज डिलीवरी के लिए निकल गया है। कृपया अपना फ़ोन चालू रखें।",
+      delivered: "नमस्ते " + f + ", आपका ऑर्डर " + id + " डिलीवर कर दिया गया है। R. Ramesh Arts Studio चुनने के लिए धन्यवाद!",
+      cancelled: "नमस्ते " + f + ", R. Ramesh Arts Studio में आपका ऑर्डर " + id + " रद्द कर दिया गया है। यदि यह अपेक्षित नहीं था या कोई सवाल हो, तो कृपया यहाँ उत्तर दें — हम मदद के लिए तैयार हैं।",
     },
     mr: {
       cLabel: "ऑर्डर निश्चित",
       oLabel: "डिलिव्हरीसाठी रवाना",
       dLabel: "डिलिव्हर झाले",
-      subject: "तुमच्या ऑर्डर #" + id + " ची माहिती",
-      confirmed: "नमस्कार " + f + ", R. Ramesh Arts Studio मधील तुमची ऑर्डर #" + id + " निश्चित झाली आहे आणि आम्ही ती तयार करायला सुरुवात केली आहे. धन्यवाद!",
-      out: "नमस्कार " + f + ", तुमची ऑर्डर #" + id + " आज डिलिव्हरीसाठी निघाली आहे. कृपया तुमचा फोन सुरू ठेवा.",
-      delivered: "नमस्कार " + f + ", तुमची ऑर्डर #" + id + " डिलिव्हर करण्यात आली आहे. R. Ramesh Arts Studio निवडल्याबद्दल धन्यवाद!",
+      xLabel: "रद्द",
+      subject: "तुमच्या ऑर्डर " + id + " ची माहिती",
+      confirmed: "नमस्कार " + f + ", R. Ramesh Arts Studio मधील तुमची ऑर्डर " + id + " निश्चित झाली आहे आणि आम्ही ती तयार करायला सुरुवात केली आहे. धन्यवाद!",
+      out: "नमस्कार " + f + ", तुमची ऑर्डर " + id + " आज डिलिव्हरीसाठी निघाली आहे. कृपया तुमचा फोन सुरू ठेवा.",
+      delivered: "नमस्कार " + f + ", तुमची ऑर्डर " + id + " डिलिव्हर करण्यात आली आहे. R. Ramesh Arts Studio निवडल्याबद्दल धन्यवाद!",
+      cancelled: "नमस्कार " + f + ", R. Ramesh Arts Studio मधील तुमची ऑर्डर " + id + " रद्द करण्यात आली आहे. हे अपेक्षित नव्हते किंवा काही प्रश्न असल्यास, कृपया येथे उत्तर द्या — आम्ही मदतीसाठी तयार आहोत.",
     },
   };
   const d = M[locale] ?? M.en;
@@ -65,6 +71,7 @@ function buildNotices(locale: string, firstName: string, shortId: string) {
     { key: "confirmed", label: d.cLabel, subject: d.subject, msg: d.confirmed },
     { key: "out", label: d.oLabel, subject: d.subject, msg: d.out },
     { key: "delivered", label: d.dLabel, subject: d.subject, msg: d.delivered },
+    { key: "cancelled", label: d.xLabel, subject: d.subject, msg: d.cancelled },
   ];
 }
 
@@ -96,7 +103,8 @@ export default async function AdminOrderDetail({ params }: { params: { id: strin
   const custPhone = String(order.phone || "").replace(/\D/g, "").slice(-10);
   const shortId = String(order.id).slice(0, 8).toUpperCase();
   const firstName = String(order.customer_name || "there").split(" ")[0];
-  const notices = buildNotices(getLocale(), firstName, shortId);
+  const orderRef = (order.invoice_no as string) || ("#" + shortId);
+  const notices = buildNotices(getLocale(), firstName, orderRef);
 
   return (
     <section className="site-wrap py-12">
@@ -216,7 +224,7 @@ export default async function AdminOrderDetail({ params }: { params: { id: strin
                 <div key={n.key} className="flex items-center justify-between gap-2">
                   <span className="text-sm">{n.label}</span>
                   <div className="flex gap-2">
-                    {custPhone && <a href={"https://wa.me/91" + custPhone + "?text=" + encodeURIComponent(n.msg)} target="_blank" rel="noreferrer" className="rounded-lg bg-[#25D366] px-3 py-1.5 text-xs font-semibold text-white">WhatsApp</a>}
+                    {custPhone && <a href={"https://web.whatsapp.com/send?phone=91" + custPhone + "&text=" + encodeURIComponent(n.msg)} target="_blank" rel="noreferrer" className="rounded-lg bg-[#25D366] px-3 py-1.5 text-xs font-semibold text-white">WhatsApp</a>}
                     {order.email && <a href={"mailto:" + order.email + "?subject=" + encodeURIComponent(n.subject) + "&body=" + encodeURIComponent(n.msg)} className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-sage-deep">Email</a>}
                   </div>
                 </div>

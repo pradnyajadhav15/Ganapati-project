@@ -89,52 +89,23 @@ export default async function Home() {
   return (
     <>
       {/* HERO */}
-      <section className="relative flex min-h-[88vh] items-center overflow-hidden bg-[radial-gradient(1200px_600px_at_80%_20%,rgba(242,201,168,.55),transparent_60%),radial-gradient(900px_500px_at_10%_80%,rgba(175,194,168,.45),transparent_60%)]">
-        <div className="site-wrap grid w-full items-center gap-10 md:grid-cols-[1.05fr_.95fr]">
-          <div className="reveal">
-            <div className="mb-5 text-[0.78rem] uppercase tracking-[0.34em] text-sage-deep">
+      <section className="relative flex min-h-[88vh] items-center overflow-hidden">
+        <Image src="/images/hero-idol.jpg" alt="Handcrafted Ganesha idol" fill sizes="100vw" className="object-cover object-center" priority />
+        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-transparent" />
+        <div className="site-wrap relative w-full">
+          <div className="reveal max-w-xl">
+            <div className="mb-5 text-[0.78rem] uppercase tracking-[0.34em] text-peach">
               {t.heroKicker}
             </div>
-            <h1 className="text-[clamp(2.6rem,5vw,4.4rem)] leading-[1.02]">
-              {t.heroTitleMain} <span className="italic text-terracotta">{t.heroTitleAccent}</span>
+            <h1 className="text-[clamp(2.6rem,5vw,4.6rem)] leading-[1.02] text-white">
+              {t.heroTitleMain} <span className="italic text-peach">{t.heroTitleAccent}</span>
             </h1>
-            <p className="my-6 max-w-md font-display text-[1.15rem] italic leading-relaxed text-ink-soft">
+            <p className="my-6 max-w-md font-display text-[1.15rem] italic leading-relaxed text-cream/90">
               {t.heroSubtitle}
             </p>
             <div className="flex flex-wrap gap-3.5">
               <Link href="/shop" className="btn-primary">{t.exploreCollections}</Link>
-            </div>
-          </div>
-
-          <div className="reveal relative grid aspect-[4/5] place-items-center overflow-hidden rounded-[180px_24px_180px_24px] bg-gradient-to-br from-peach to-rose shadow-soft [animation-delay:.15s]">
-            <div className="absolute inset-[18px] rounded-[168px_18px_168px_18px] border-2 border-dashed border-white/60" />
-            <Image src="/images/hero-idol.jpg" alt="Handcrafted Ganesha idol" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" priority />
-          </div>
-        </div>
-      </section>
-
-      {/* STATS */}
-      <section className="border-y border-line bg-cream-deep">
-        <div className="site-wrap grid gap-8 py-10 sm:grid-cols-3">
-          <div className="flex items-center justify-center gap-3">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-9 w-9 shrink-0 text-terracotta"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
-            <div>
-              <div className="font-display text-3xl leading-none text-ink">5,000+</div>
-              <div className="mt-1 text-sm text-ink-soft">Safe idol deliveries</div>
-            </div>
-          </div>
-          <div className="flex items-center justify-center gap-3">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-9 w-9 shrink-0 text-terracotta"><circle cx="12" cy="8" r="6" /><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" /></svg>
-            <div>
-              <div className="font-display text-3xl leading-none text-ink">20+ years</div>
-              <div className="mt-1 text-sm text-ink-soft">of trusted service</div>
-            </div>
-          </div>
-          <div className="flex items-center justify-center gap-3">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-9 w-9 shrink-0 text-terracotta"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" /><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" /><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" /></svg>
-            <div>
-              <div className="font-display text-base leading-tight text-ink">100% Handcrafted</div>
-              <div className="mt-1 text-sm text-ink-soft">By skilled Solapur artisans</div>
             </div>
           </div>
         </div>

@@ -188,6 +188,11 @@ export async function placeOrder(input: Input): Promise<{
 
   // UPI QR or Cash on Delivery: order is placed as pending. Notify owner + count coupon now.
   try {
+    await supabaseAdmin.rpc("assign_invoice_no", { p_order_id: order.id });
+  } catch (e) {
+    console.error("assign_invoice_no (cod/upi) failed:", e);
+  }
+  try {
     await notifyOwnerOfOrder(order.id);
   } catch (e) {
     console.error("Owner notification failed:", e);

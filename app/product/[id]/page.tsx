@@ -15,7 +15,7 @@ import PreBookForm from "@/components/PreBookForm";
 
 export const dynamic = "force-dynamic";
 
-const siteUrl = "https://www.rrameshartsstudio.in";
+const siteUrl = "https://www.rramesharts.com";
 
 export default async function ProductPage({
   params,

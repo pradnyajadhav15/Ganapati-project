@@ -1,10 +1,10 @@
-import type { MetadataRoute } from "next";
+﻿import type { MetadataRoute } from "next";
 import { getProducts } from "@/lib/products";
 
-const base = "https://www.rrameshartsstudio.in";
+const base = "https://www.rramesharts.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const staticРaths = [
+  const staticÐ aths = [
     "",
     "/collections",
     "/collections/dashboard-idols",
@@ -23,7 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/shipping-policy",
   ];
 
-  const staticRoutes: MetadataRoute.Sitemap = staticРaths.map((path) => ({
+  const staticRoutes: MetadataRoute.Sitemap = staticÐ aths.map((path) => ({
     url: base + path,
     lastModified: new Date(),
   }));

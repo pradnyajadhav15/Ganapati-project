@@ -30,6 +30,9 @@ export default async function AdminPage() {
           <Link href="/admin/orders" className="btn-ghost">
             View Orders
           </Link>
+          <Link href="/admin/today" className="btn-ghost">
+            Today
+          </Link>
           <Link href="/admin/bookings" className="btn-ghost">
             Pre-bookings
           </Link>

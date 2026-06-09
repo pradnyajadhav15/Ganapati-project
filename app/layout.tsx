@@ -23,7 +23,7 @@ const mukta = Mukta({
   variable: "--font-mukta",
 });
 
-const siteUrl = "https://www.rrameshartsstudio.in";
+const siteUrl = "https://www.rramesharts.com";
 const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
 export const metadata: Metadata = {

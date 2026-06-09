@@ -12,8 +12,15 @@ const STUDIO = {
   addr2: "Solapur, Maharashtra - 413006",
   phone: "+91 70202 90393",
   email: "rrameshartsstudio@gmail.com",
-  web: "rrameshartsstudio.in",
+  web: "rramesharts.com",
   gstin: "",
+};
+
+const BANK = {
+  accountName: "R. Ramesh Arts Studio",
+  bankName: "Punjab National Bank",
+  accountNo: "3764001500042019",
+  ifsc: "PUNB0376400",
 };
 
 export type ReceiptOrder = {
@@ -87,14 +94,13 @@ export async function generateReceiptPdf(order: ReceiptOrder, items: ReceiptItem
   const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
 
   const devaPath = path.join(process.cwd(), "public", "fonts", "NotoSansDevanagari-Regular.ttf");
-  const deva = await pdf.embedFont(fs.readFileSync(devaPath), { subset: true });
+  const deva = await pdf.embedFont(fs.readFileSync(devaPath), { subset: false });
 
   let logo: any = null;
-  try {
-    logo = await pdf.embedPng(fs.readFileSync(path.join(process.cwd(), "public", "images", "logo.png")));
-  } catch {
-    logo = null;
-  }
+  try { logo = await pdf.embedPng(fs.readFileSync(path.join(process.cwd(), "public", "images", "logo.png"))); } catch { logo = null; }
+
+  let sign: any = null;
+  try { sign = await pdf.embedPng(fs.readFileSync(path.join(process.cwd(), "public", "images", "signature.png"))); } catch { sign = null; }
 
   const left = 50;
   const right = 545;
@@ -110,6 +116,10 @@ export async function generateReceiptPdf(order: ReceiptOrder, items: ReceiptItem
   };
   const drawCenter = (text: string, y: number, f: any, size: number, color: any) => {
     page.drawText(text, { x: (W - f.widthOfTextAtSize(text, size)) / 2, y, font: f, size, color });
+  };
+  const drawCenterIn = (text: string, x0: number, x1: number, y: number, f: any, size: number, color: any) => {
+    const wd = f.widthOfTextAtSize(text, size);
+    page.drawText(text, { x: x0 + ((x1 - x0) - wd) / 2, y, font: f, size, color });
   };
 
   if (logo) {
@@ -134,24 +144,31 @@ export async function generateReceiptPdf(order: ReceiptOrder, items: ReceiptItem
   page.drawLine({ start: { x: left, y }, end: { x: right, y }, color: green, thickness: 1.4 });
 
   y -= 22;
-  const billTop = y;
-  page.drawText("BILL TO", { x: left, y, font: bold, size: 8.5, color: green });
-  let by = y - 15;
-  if (order.customer_name) { page.drawText(order.customer_name, { x: left, y: by, font: deva, size: 11, color: ink }); by -= 14; }
-  for (const ln of wrap(order.address ?? "", 48)) { page.drawText(ln, { x: left, y: by, font: deva, size: 9.5, color: soft }); by -= 12; }
+  const blockTop = y;
+  const billX = left;
+  const shipX = 230;
+
+  drawRight(order.invoice_no || ("RA-" + String(order.id).slice(0, 8).toUpperCase()), right, blockTop, bold, 13, ink);
+  drawRight(new Date(order.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }), right, blockTop - 16, font, 9.5, soft);
+  if (order.razorpay_payment_id) drawRight("Paid online", right, blockTop - 30, bold, 8.5, green);
+
+  page.drawText("BILL TO", { x: billX, y: blockTop, font: bold, size: 8.5, color: green });
+  let billY = blockTop - 15;
+  if (order.customer_name) { page.drawText(order.customer_name, { x: billX, y: billY, font: deva, size: 10.5, color: ink }); billY -= 13; }
+  if (order.phone) { page.drawText("Phone: " + order.phone, { x: billX, y: billY, font, size: 9, color: soft }); billY -= 12; }
+  if (order.email) { page.drawText("Email: " + order.email, { x: billX, y: billY, font, size: 9, color: soft }); billY -= 12; }
+
+  page.drawText("SHIP TO", { x: shipX, y: blockTop, font: bold, size: 8.5, color: green });
+  let shipY = blockTop - 15;
+  if (order.customer_name) { page.drawText(order.customer_name, { x: shipX, y: shipY, font: deva, size: 10.5, color: ink }); shipY -= 13; }
+  for (const ln of wrap(order.address ?? "", 30)) { page.drawText(ln, { x: shipX, y: shipY, font: deva, size: 9, color: soft }); shipY -= 11; }
   const locParts = [order.city, order.state].filter(Boolean).join(", ");
   const cityLine = order.pincode ? (locParts ? locParts + " - " + order.pincode : String(order.pincode)) : locParts;
-  if (cityLine) { page.drawText(cityLine, { x: left, y: by, font: deva, size: 9.5, color: soft }); by -= 12; }
-  if (order.phone) { page.drawText("Phone: " + order.phone, { x: left, y: by, font, size: 9, color: soft }); by -= 12; }
-  if (order.email) { page.drawText("Email: " + order.email, { x: left, y: by, font, size: 9, color: soft }); by -= 12; }
+  if (cityLine) { page.drawText(cityLine, { x: shipX, y: shipY, font: deva, size: 9, color: soft }); shipY -= 11; }
 
-  drawRight(order.invoice_no || ("RA-" + String(order.id).slice(0, 8).toUpperCase()), right, billTop, bold, 13, ink);
-  drawRight(new Date(order.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }), right, billTop - 16, font, 9.5, soft);
-  if (order.razorpay_payment_id) drawRight("Paid online", right, billTop - 30, bold, 8.5, green);
-
-  let ty = Math.min(by, billTop - 46) - 6;
+  let ty = Math.min(billY, shipY, blockTop - 30) - 10;
   const colSr = left + 6;
-  const colProd = left + 32;
+  const colProd = left + 30;
   const colQty = 400;
   const colRate = 470;
   const colAmt = right - 5;
@@ -199,17 +216,34 @@ export async function generateReceiptPdf(order: ReceiptOrder, items: ReceiptItem
   page.drawRectangle({ x: labelX - 8, y: tyy - 4, width: colAmt - (labelX - 8) + 5, height: 22, color: green });
   page.drawText("Grand Total", { x: labelX, y: tyy + 4, font: bold, size: 11, color: white });
   drawRight(rupees(order.total), colAmt, tyy + 4, bold, 11, white);
+  const totalsBottom = tyy - 4;
 
   let wy = ty - 14;
   page.drawText("Amount in words:", { x: left, y: wy, font: bold, size: 8.5, color: soft });
   wy -= 13;
   for (const ln of wrap("Rupees " + numberToWords(order.total) + " Only", 40)) { page.drawText(ln, { x: left, y: wy, font, size: 9, color: ink }); wy -= 12; }
 
-  let ny = Math.min(tyy - 24, wy - 16);
-  page.drawLine({ start: { x: left, y: ny + 12 }, end: { x: right, y: ny + 12 }, color: lineCol, thickness: 0.5 });
-  page.drawText("Please note", { x: left, y: ny, font: bold, size: 9, color: ink }); ny -= 14;
-  page.drawText("1. Payment received with thanks.", { x: left, y: ny, font, size: 9, color: soft }); ny -= 13;
-  page.drawText("2. Thank you for choosing R. Ramesh Arts Studio.", { x: left, y: ny, font, size: 9, color: soft });
+  let blockY = Math.min(totalsBottom, wy) - 38;
+  if (blockY < 165) blockY = 165;
+
+  const sigCx = 472;
+  drawCenterIn("For " + STUDIO.name, 400, right, blockY, font, 8.5, soft);
+  if (sign) {
+    const ss = Math.min(120 / sign.width, 40 / sign.height);
+    page.drawImage(sign, { x: sigCx - (sign.width * ss) / 2, y: blockY - 48, width: sign.width * ss, height: sign.height * ss });
+  }
+  page.drawLine({ start: { x: 405, y: blockY - 52 }, end: { x: 540, y: blockY - 52 }, color: lineCol, thickness: 0.6 });
+  drawCenterIn("Authorised Signatory", 400, right, blockY - 64, font, 8, soft);
+
+  const bTop = blockY + 8;
+  const bBottom = blockY - 66;
+  page.drawRectangle({ x: left, y: bBottom, width: 250, height: bTop - bBottom, borderColor: lineCol, borderWidth: 0.8, color: white });
+  let bky = blockY - 6;
+  page.drawText("Banking Details", { x: left + 8, y: bky, font: bold, size: 8.5, color: green }); bky -= 14;
+  page.drawText("Account Name: " + BANK.accountName, { x: left + 8, y: bky, font, size: 8, color: ink }); bky -= 12;
+  page.drawText("Bank: " + BANK.bankName, { x: left + 8, y: bky, font, size: 8, color: ink }); bky -= 12;
+  page.drawText("A/C No: " + BANK.accountNo, { x: left + 8, y: bky, font, size: 8, color: ink }); bky -= 12;
+  page.drawText("IFSC: " + BANK.ifsc, { x: left + 8, y: bky, font, size: 8, color: ink });
 
   page.drawLine({ start: { x: left, y: 70 }, end: { x: right, y: 70 }, color: lineCol, thickness: 0.5 });
   drawCenter(STUDIO.name + "   |   " + STUDIO.phone + "   |   " + STUDIO.web, 56, font, 8.5, soft);
