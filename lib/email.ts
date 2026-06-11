@@ -38,7 +38,7 @@ export async function notifyOwnerOfOrder(orderId: string) {
 
   const resend = new Resend(apiKey);
   await resend.emails.send({
-    from: "R. Ramesh Arts <onboarding@resend.dev>",
+    from: "R. Ramesh Arts <orders@rramesharts.com>",
     to: [to],
     subject: "New Order - Rs " + order.total + " from " + order.customer_name,
     text: text,
@@ -83,7 +83,7 @@ export async function notifyCustomerOfOrder(orderId: string, customerEmail: stri
 
   const resend = new Resend(apiKey);
   await resend.emails.send({
-    from: "R. Ramesh Arts <onboarding@resend.dev>",
+    from: "R. Ramesh Arts <orders@rramesharts.com>",
     to: [customerEmail],
     subject: "Order Confirmed - #" + shortId + " - R. Ramesh Arts Studio",
     text: text,
@@ -111,7 +111,7 @@ export async function notifyOwnerOfContact(input: {
   try {
     const resend = new Resend(apiKey);
     await resend.emails.send({
-      from: "R. Ramesh Arts <onboarding@resend.dev>",
+      from: "R. Ramesh Arts <orders@rramesharts.com>",
       to: [to],
       subject: "New enquiry from " + input.name,
       text: text,
@@ -151,7 +151,7 @@ export async function notifyOwnerOfBooking(bookingId: string) {
 
   const resend = new Resend(apiKey);
   await resend.emails.send({
-    from: "R. Ramesh Arts <onboarding@resend.dev>",
+    from: "R. Ramesh Arts <orders@rramesharts.com>",
     to: [to],
     subject: "New Pre-booking - " + b.product_name + " from " + b.customer_name,
     text: text,
@@ -185,7 +185,7 @@ export async function notifyCustomerOfBooking(bookingId: string, customerEmail: 
 
   const resend = new Resend(apiKey);
   await resend.emails.send({
-    from: "R. Ramesh Arts <onboarding@resend.dev>",
+    from: "R. Ramesh Arts <orders@rramesharts.com>",
     to: [customerEmail],
     subject: "Pre-booking Received - " + b.product_name + " - R. Ramesh Arts Studio",
     text: text,
