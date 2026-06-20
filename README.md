@@ -1,4 +1,4 @@
-# R. Ramesh Arts Studio — E-commerce Website
+# E-commerce Website
 
 A full-featured, multilingual e-commerce platform for **R. Ramesh Arts Studio**, a family-rooted business (Est. 2002) handcrafting Ganpati idols in Solapur, Maharashtra. Customers can browse idols and accessories, pay online or via COD/UPI, and pre-book for the season — while the owner manages the entire business from a custom admin dashboard, no code required.
 
