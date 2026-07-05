@@ -2,7 +2,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { updateBookingStatus } from "@/app/admin/actions";
+import { updateBookingStatus, deleteBooking } from "@/app/admin/actions";
 import BookingAdvanceButton from "@/components/BookingAdvanceButton";
 
 export const dynamic = "force-dynamic";
@@ -31,11 +31,7 @@ const STATUSES = [
 ];
 
 export default async function AdminBookingsPage() {
-  if (cookies().get("admin_session")?.value !== "ok") {
-    redirect("/admin/login");
-  }
-
-  const { data } = await supabaseAdmin
+    const { data } = await supabaseAdmin
     .from("bookings")
     .select("id,product_name,customer_name,phone,total_price,token_amount,balance_due,status,notes,payment_link,created_at")
     .order("created_at", { ascending: false });
@@ -98,7 +94,17 @@ export default async function AdminBookingsPage() {
               <p className="mt-2 text-xs text-ink-soft/60">
                 {new Date(b.created_at).toLocaleString("en-IN")}
               </p>
-            </div>
+
+              <form
+                action={deleteBooking}
+                onSubmit={(e) => { if (!confirm("Permanently delete this pre-booking?")) e.preventDefault(); }}
+                className="mt-3"
+              >
+                <input type="hidden" name="id" value={b.id} />
+                <button type="submit" className="rounded-full border border-red-300 px-3 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-50">
+                  Delete
+                </button>
+              </form>            </div>
           ))}
         </div>
       )}

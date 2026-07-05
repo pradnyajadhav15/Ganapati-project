@@ -10,8 +10,7 @@ export const metadata = { title: "Admin - Team" };
 type Member = { id: string; name: string; role: string | null; sort_order: number };
 
 export default async function AdminTeamPage() {
-  if (cookies().get("admin_session")?.value !== "ok") redirect("/admin/login");
-
+  
   const { data } = await supabaseAdmin
     .from("team_members")
     .select("id,name,role,sort_order")

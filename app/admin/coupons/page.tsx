@@ -27,11 +27,7 @@ const inputClass =
   "w-full rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-sage-deep";
 
 export default async function AdminCouponsPage() {
-  if (cookies().get("admin_session")?.value !== "ok") {
-    redirect("/admin/login");
-  }
-
-  const { data } = await supabaseAdmin
+    const { data } = await supabaseAdmin
     .from("coupons")
     .select("id,code,discount_type,discount_value,min_order,max_uses,used_count,active,expires_at")
     .order("created_at", { ascending: false });

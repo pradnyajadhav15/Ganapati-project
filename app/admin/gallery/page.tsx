@@ -23,11 +23,7 @@ const inputClass =
   "w-full rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-sage-deep";
 
 export default async function AdminGalleryPage() {
-  if (cookies().get("admin_session")?.value !== "ok") {
-    redirect("/admin/login");
-  }
-
-  const { data } = await supabaseAdmin
+    const { data } = await supabaseAdmin
     .from("gallery")
     .select("id,image_url,caption,sort_order,visible")
     .order("sort_order", { ascending: true })

@@ -26,11 +26,7 @@ const inputClass =
   "w-full rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-sage-deep";
 
 export default async function AdminTestimonialsPage() {
-  if (cookies().get("admin_session")?.value !== "ok") {
-    redirect("/admin/login");
-  }
-
-  const { data } = await supabaseAdmin
+    const { data } = await supabaseAdmin
     .from("testimonials")
     .select("id,quote,customer_name,city,rating,image_url,sort_order,visible")
     .order("sort_order", { ascending: true })

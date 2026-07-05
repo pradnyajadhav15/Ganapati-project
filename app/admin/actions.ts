@@ -190,3 +190,11 @@ export async function updateBookingStatus(formData: FormData) {
 
   revalidatePath("/admin/bookings");
 }
+
+
+export async function deleteBooking(formData: FormData) {
+  const id = String(formData.get("id"));
+  const { error } = await supabaseAdmin.from("bookings").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/bookings");
+}

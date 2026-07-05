@@ -27,11 +27,7 @@ const inputClass =
   "w-full rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-sage-deep";
 
 export default async function AdminAccessoriesPage() {
-  if (cookies().get("admin_session")?.value !== "ok") {
-    redirect("/admin/login");
-  }
-
-  const { data } = await supabaseAdmin
+    const { data } = await supabaseAdmin
     .from("accessories")
     .select("id,name,subtitle,price,image_url,sort_order,visible,image_urls")
     .order("sort_order", { ascending: true })

@@ -1,8 +1,7 @@
 ﻿import Link from "next/link";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import SubscriberExport from "@/components/SubscriberExport";
+import { deleteSubscriber } from "@/app/admin/subscriber-actions";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin - Subscribers" };
@@ -20,10 +19,6 @@ function waLink(phone: string) {
 }
 
 export default async function AdminSubscribersPage() {
-  if (cookies().get("admin_session")?.value !== "ok") {
-    redirect("/admin/login");
-  }
-
   const { data } = await supabaseAdmin
     .from("subscribers")
     .select("id,name,email,phone,created_at")
@@ -52,6 +47,7 @@ export default async function AdminSubscribersPage() {
                 <th className="p-4">Email</th>
                 <th className="p-4">WhatsApp</th>
                 <th className="p-4">Date</th>
+                <th className="p-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -67,6 +63,17 @@ export default async function AdminSubscribersPage() {
                     )}
                   </td>
                   <td className="p-4 text-ink-soft">{new Date(s.created_at).toLocaleDateString("en-IN")}</td>
+                  <td className="p-4 text-right">
+                    <form
+                      action={deleteSubscriber}
+                      onSubmit={(e) => { if (!confirm("Remove this subscriber?")) e.preventDefault(); }}
+                    >
+                      <input type="hidden" name="id" value={s.id} />
+                      <button type="submit" className="rounded-full border border-red-300 px-3 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-50">
+                        Delete
+                      </button>
+                    </form>
+                  </td>
                 </tr>
               ))}
             </tbody>

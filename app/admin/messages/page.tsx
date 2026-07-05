@@ -10,8 +10,7 @@ export const metadata = { title: "Admin - Messages" };
 type Msg = { id: string; name: string; email: string | null; phone: string | null; message: string; is_read: boolean; created_at: string };
 
 export default async function AdminMessagesPage() {
-  if (cookies().get("admin_session")?.value !== "ok") redirect("/admin/login");
-
+  
   const { data } = await supabaseAdmin
     .from("contact_messages")
     .select("id,name,email,phone,message,is_read,created_at")
