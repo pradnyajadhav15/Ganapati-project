@@ -1,10 +1,9 @@
-import { type NextRequest, NextResponse } from "next/server";
+﻿import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
 
-  // Keep the customer's Supabase session fresh on every request.
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -25,12 +24,16 @@ export async function middleware(request: NextRequest) {
       },
     }
   );
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  // Admin password gate (temporary, separate from customer login).
+  // Admin gate: must be logged in AND be the designated admin account.
   const { pathname } = request.nextUrl;
   if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
-    if (request.cookies.get("admin_session")?.value !== "ok") {
+    const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase();
+    const userEmail = user?.email?.toLowerCase();
+    if (!user || !adminEmail || userEmail !== adminEmail) {
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
   }
@@ -38,7 +41,6 @@ export async function middleware(request: NextRequest) {
   return response;
 }
 
-// Run on all routes except static assets and image files.
 export const config = {
   matcher: [
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",

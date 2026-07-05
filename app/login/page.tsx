@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { signIn } from "../auth/actions";
 import { getLocale } from "@/lib/locale";
 import { getDict } from "@/lib/i18n";
@@ -10,7 +10,7 @@ const field =
 export default function LoginPage({
   searchParams,
 }: {
-  searchParams: { error?: string };
+  searchParams: { error?: string; message?: string };
 }) {
   const t = getDict(getLocale());
 
@@ -28,6 +28,14 @@ export default function LoginPage({
           <input name="email" type="email" required placeholder={t.emailPlaceholder} className={field} />
           <input name="password" type="password" required placeholder={t.passwordPlaceholder} className={field} />
         </div>
+        <p className="mt-2 text-right text-sm">
+          <Link href="/forgot-password" className="text-sage-deep underline">
+            Forgot password?
+          </Link>
+        </p>
+        {searchParams?.message && (
+          <p className="mt-3 text-sm text-sage-deep">{searchParams.message}</p>
+        )}
         {searchParams?.error && (
           <p className="mt-3 text-sm text-red-600">{searchParams.error}</p>
         )}

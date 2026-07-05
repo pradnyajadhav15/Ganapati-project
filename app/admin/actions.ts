@@ -2,27 +2,33 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
 // --- Auth ---
 
 export async function login(formData: FormData) {
-  const pw = formData.get("password");
-  if (pw && pw === process.env.ADMIN_PASSWORD) {
-    cookies().set("admin_session", "ok", {
-      httpOnly: true,
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 8,
-    });
-    redirect("/admin");
+  const supabase = createSupabaseServerClient();
+  const email = String(formData.get("email"));
+  const password = String(formData.get("password"));
+
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+  const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase();
+  const loggedInEmail = data.user?.email?.toLowerCase();
+
+
+  if (error || !adminEmail || loggedInEmail !== adminEmail) {
+    await supabase.auth.signOut();
+    redirect("/admin/login?error=1");
   }
-  redirect("/admin/login?error=1");
+
+  redirect("/admin");
 }
 
 export async function logout() {
-  cookies().delete("admin_session");
+  const supabase = createSupabaseServerClient();
+  await supabase.auth.signOut();
   redirect("/admin/login");
 }
 
