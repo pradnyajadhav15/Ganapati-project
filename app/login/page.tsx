@@ -2,6 +2,7 @@
 import { signIn } from "../auth/actions";
 import { getLocale } from "@/lib/locale";
 import { getDict } from "@/lib/i18n";
+import PasswordInput from "@/components/PasswordInput";
 
 export const metadata = { title: "Log In — R. Ramesh Arts Studio" };
 const field =
@@ -26,7 +27,7 @@ export default function LoginPage({
         </p>
         <div className="space-y-4">
           <input name="email" type="email" required placeholder={t.emailPlaceholder} className={field} />
-          <input name="password" type="password" required placeholder={t.passwordPlaceholder} className={field} />
+          <PasswordInput name="password" required placeholder={t.passwordPlaceholder} className={field} />
         </div>
         <p className="mt-2 text-right text-sm">
           <Link href="/forgot-password" className="text-sage-deep underline">

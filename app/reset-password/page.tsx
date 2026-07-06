@@ -1,4 +1,5 @@
 ﻿import { updatePassword } from "../auth/actions";
+import PasswordInput from "@/components/PasswordInput";
 
 export const metadata = { title: "Reset Password — R. Ramesh Arts Studio" };
 const field =
@@ -20,8 +21,8 @@ export default function ResetPasswordPage({
           Choose a new password for your account.
         </p>
         <div className="space-y-4">
-          <input name="password" type="password" required minLength={6} placeholder="New password" className={field} />
-          <input name="confirm" type="password" required minLength={6} placeholder="Confirm new password" className={field} />
+          <PasswordInput name="password" required minLength={6} placeholder="New password" className={field} />
+          <PasswordInput name="confirm" required minLength={6} placeholder="Confirm new password" className={field} />
         </div>
         {searchParams?.error && (
           <p className="mt-3 text-sm text-red-600">{searchParams.error}</p>

@@ -1,7 +1,8 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { signUp } from "../auth/actions";
 import { getLocale } from "@/lib/locale";
 import { getDict } from "@/lib/i18n";
+import PasswordInput from "@/components/PasswordInput";
 
 export const metadata = { title: "Sign Up — R. Ramesh Arts Studio" };
 const field =
@@ -27,7 +28,7 @@ export default function SignupPage({
         <div className="space-y-4">
           <input name="name" type="text" placeholder={t.fullName} className={field} />
           <input name="email" type="email" required placeholder={t.emailPlaceholder} className={field} />
-          <input name="password" type="password" required minLength={6} placeholder={t.passwordMin6} className={field} />
+          <PasswordInput name="password" required minLength={6} placeholder={t.passwordMin6} className={field} />
         </div>
         {searchParams?.error && (
           <p className="mt-3 text-sm text-red-600">{searchParams.error}</p>
