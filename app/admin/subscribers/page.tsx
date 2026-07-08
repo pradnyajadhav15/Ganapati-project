@@ -2,6 +2,7 @@
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import SubscriberExport from "@/components/SubscriberExport";
 import { deleteSubscriber } from "@/app/admin/subscriber-actions";
+import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin - Subscribers" };
@@ -64,14 +65,14 @@ export default async function AdminSubscribersPage() {
                   </td>
                   <td className="p-4 text-ink-soft">{new Date(s.created_at).toLocaleDateString("en-IN")}</td>
                   <td className="p-4 text-right">
-                    <form
-                      action={deleteSubscriber}
-                      onSubmit={(e) => { if (!confirm("Remove this subscriber?")) e.preventDefault(); }}
-                    >
+                    <form action={deleteSubscriber}>
                       <input type="hidden" name="id" value={s.id} />
-                      <button type="submit" className="rounded-full border border-red-300 px-3 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-50">
+                      <ConfirmSubmitButton
+                        confirmMessage="Remove this subscriber?"
+                        className="rounded-full border border-red-300 px-3 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-50"
+                      >
                         Delete
-                      </button>
+                      </ConfirmSubmitButton>
                     </form>
                   </td>
                 </tr>

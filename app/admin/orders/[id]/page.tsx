@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { formatINR } from "@/lib/format";
 import { regenerateReceipt } from "@/app/checkout/actions";
-import { setPaymentStatus, setProgressStatus, saveOrderNotes } from "../status-actions";
+import { setPaymentStatus, setProgressStatus, saveOrderNotes, refundOrder } from "../status-actions";
+import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 import { getLocale } from "@/lib/locale";
 
 export const dynamic = "force-dynamic";
@@ -201,6 +202,17 @@ export default async function AdminOrderDetail({ params }: { params: { id: strin
               <div className="mt-2 text-ink-soft">Razorpay Payment ID</div>
               <div className="break-all font-mono text-xs">{order.razorpay_payment_id || "-"}</div>
             </div>
+            {order.payment_method === "razorpay" && pay === "paid" && order.razorpay_payment_id ? (
+              <form action={refundOrder} className="mt-4 border-t border-line pt-4">
+                <input type="hidden" name="id" value={order.id as string} />
+                <ConfirmSubmitButton
+                  confirmMessage={"Refund Rs " + Number(order.total).toLocaleString("en-IN") + " to the customer via Razorpay? This cannot be undone."}
+                  className="w-full rounded-xl border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                >
+                  Refund via Razorpay
+                </ConfirmSubmitButton>
+              </form>
+            ) : null}
           </div>
 
           <div className="rounded-xl2 border border-line bg-white p-6">

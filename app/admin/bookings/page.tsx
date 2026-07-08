@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { updateBookingStatus, deleteBooking } from "@/app/admin/actions";
 import BookingAdvanceButton from "@/components/BookingAdvanceButton";
+import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin - Bookings" };
@@ -95,15 +96,14 @@ export default async function AdminBookingsPage() {
                 {new Date(b.created_at).toLocaleString("en-IN")}
               </p>
 
-              <form
-                action={deleteBooking}
-                onSubmit={(e) => { if (!confirm("Permanently delete this pre-booking?")) e.preventDefault(); }}
-                className="mt-3"
-              >
+              <form action={deleteBooking} className="mt-3">
                 <input type="hidden" name="id" value={b.id} />
-                <button type="submit" className="rounded-full border border-red-300 px-3 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-50">
+                <ConfirmSubmitButton
+                  confirmMessage="Permanently delete this pre-booking?"
+                  className="rounded-full border border-red-300 px-3 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-50"
+                >
                   Delete
-                </button>
+                </ConfirmSubmitButton>
               </form>            </div>
           ))}
         </div>
