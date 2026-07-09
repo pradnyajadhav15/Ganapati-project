@@ -51,7 +51,7 @@ const dictionaries = {
     orderSummary: "Order Summary",
     processing: "Processing…",
     pay: "Pay",
-    securePayment: "Secure payment by Razorpay. Test mode — no real money is charged.",
+    securePayment: "Secure payment powered by Razorpay.",
     pleaseLogIn: "Please log in to checkout",
     cartSaved: "Your cart is saved — just sign in and come back.",
     ourStory: "Our Story",
