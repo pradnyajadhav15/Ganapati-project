@@ -1,4 +1,5 @@
-﻿import PageHero from "@/components/PageHero";
+﻿import Link from "next/link";
+import PageHero from "@/components/PageHero";
 import Image from "next/image";
 import { getLocale } from "@/lib/locale";
 import { getDict, type Dict } from "@/lib/i18n";
@@ -83,6 +84,10 @@ export default async function Page() {
           &quot;{t.aboutQuote2}&quot;
           <span className="mt-2 block text-sm not-italic">- Suhas Raichurkar</span>
         </blockquote>
+      </section>
+
+      <section className="site-wrap pb-20 text-center">
+        <Link href="/blog" className="text-sage-deep underline">Read our stories &rarr;</Link>
       </section>
     </>
   );

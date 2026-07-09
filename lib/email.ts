@@ -191,3 +191,24 @@ export async function notifyCustomerOfBooking(bookingId: string, customerEmail: 
     text: text,
   });
 }
+
+
+export async function notifyOwnerOfSoldOut(productName: string) {
+  const apiKey = process.env.RESEND_API_KEY;
+  const to = process.env.OWNER_EMAIL;
+  if (!apiKey || !to) return { ok: false };
+
+  try {
+    const resend = new Resend(apiKey);
+    await resend.emails.send({
+      from: "R. Ramesh Arts <orders@rramesharts.com>",
+      to: [to],
+      subject: "Marked Sold Out: " + productName,
+      text: "You just marked \"" + productName + "\" as Sold Out. Update stock when restocked.",
+    });
+    return { ok: true };
+  } catch (e) {
+    console.error("Sold-out email failed:", e);
+    return { ok: false };
+  }
+}

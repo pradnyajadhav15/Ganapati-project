@@ -197,6 +197,14 @@ export default async function Home() {
         </div>
       </section>
 
+      <section className="site-wrap py-10 text-center">
+        <a href="https://g.page/r/CYDuo4LYTn3-EAE/review" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-5 py-3 shadow-soft transition hover:shadow-md">
+          <span className="text-gold">★★★★★</span>
+          <span className="font-semibold">5.0 on Google</span>
+          <span className="text-ink-soft">— See our reviews</span>
+        </a>
+      </section>
+
       {/* HERITAGE */}
       <section className="bg-[radial-gradient(900px_500px_at_85%_30%,rgba(242,201,168,.35),transparent_60%)] py-[90px]">
         <div className="site-wrap grid items-center gap-12 md:grid-cols-[0.82fr_1.18fr]">
@@ -224,6 +232,16 @@ export default async function Home() {
       </section>
 
 
+
+      <section className="site-wrap py-10 text-center">
+        <p className="kicker mb-2">As Featured In</p>
+        <a href="/media-coverage" className="text-ink-soft underline hover:text-ink">
+          See where R. Ramesh Arts Studio has been covered →
+        </a>
+        <div className="mt-3">
+          <a href="/blog" className="text-ink-soft underline hover:text-ink">Read Our Stories &rarr;</a>
+        </div>
+      </section>
 
       <Testimonials />
 

@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import PageHero from "@/components/PageHero";
 import { getLocale } from "@/lib/locale";
 import { getDict, type Dict } from "@/lib/i18n";

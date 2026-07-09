@@ -39,6 +39,7 @@ export default function Footer() {
               [t.initiative, "/initiative"],
               [t.collections, "/collections/shadu-mati-idols"],
               [t.news, "/media-coverage"],
+              ["Our Stories", "/blog"],
     
 
             ]}

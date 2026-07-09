@@ -113,6 +113,10 @@ export async function updateProduct(formData: FormData) {
   };
   if (hasNewImage) updates.image_url = image_url;
   updates.in_stock = formData.get("in_stock") === "on";
+  if (!updates.in_stock) {
+    const { notifyOwnerOfSoldOut } = await import("@/lib/email");
+    notifyOwnerOfSoldOut(String(formData.get("name")));
+  }
   const capRaw = formData.get("season_capacity");
   updates.season_capacity = capRaw === null || String(capRaw).trim() === "" ? null : Number(capRaw);
 
