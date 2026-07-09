@@ -12,15 +12,9 @@ function slugify(title: string) {
     .replace(/(^-|-$)/g, "");
 }
 
+import { uploadCompressedImage } from "@/lib/image-upload";
 async function uploadCover(file: File): Promise<string> {
-  const ext = file.name.split(".").pop() || "jpg";
-  const path = "blog-" + Date.now() + "-" + Math.random().toString(36).slice(2) + "." + ext;
-  const bytes = await file.arrayBuffer();
-  const { error } = await supabaseAdmin.storage
-    .from("product-images")
-    .upload(path, bytes, { contentType: file.type, upsert: false });
-  if (error) throw new Error(error.message);
-  return supabaseAdmin.storage.from("product-images").getPublicUrl(path).data.publicUrl;
+  return uploadCompressedImage(file, "blog-");
 }
 
 export async function createPost(formData: FormData) {

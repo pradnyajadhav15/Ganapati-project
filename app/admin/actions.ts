@@ -34,15 +34,9 @@ export async function logout() {
 
 // --- Product management ---
 
+import { uploadCompressedImage } from "@/lib/image-upload";
 async function uploadImage(file: File): Promise<string> {
-  const ext = file.name.split(".").pop() || "jpg";
-  const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-  const bytes = await file.arrayBuffer();
-  const { error: upErr } = await supabaseAdmin.storage
-    .from("product-images")
-    .upload(path, bytes, { contentType: file.type, upsert: false });
-  if (upErr) throw new Error("Image upload failed: " + upErr.message);
-  return supabaseAdmin.storage.from("product-images").getPublicUrl(path).data.publicUrl;
+  return uploadCompressedImage(file);
 }
 
 export async function createProduct(formData: FormData) {
