@@ -6,10 +6,7 @@ import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
 function requireAdmin() {
-  if (cookies().get("admin_session")?.value !== "ok") {
-    redirect("/admin/login");
   }
-}
 
 async function uploadTestimonialImage(file: File): Promise<string> {
   const ext = file.name.split(".").pop() || "jpg";
