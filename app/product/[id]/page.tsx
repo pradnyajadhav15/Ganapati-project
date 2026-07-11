@@ -137,7 +137,7 @@ export default async function ProductPage({
             {formatINR(product.price)}
           </div>
           {displayDesc && (
-            <p className="mb-6 max-w-md text-ink-soft">{displayDesc}</p>
+            <p className="mb-6 max-w-md whitespace-pre-wrap text-ink-soft">{displayDesc}</p>
           )}
 
           {canBuy && remaining !== null && (

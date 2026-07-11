@@ -57,6 +57,9 @@ export default async function AdminPage() {
           <Link href="/admin/gallery" className="btn-ghost">
             Gallery
           </Link>
+          <Link href="/admin/blog" className="btn-ghost">
+            Blog
+          </Link>
           <Link href="/admin/products/new" className="btn-primary">
             + Add Product
           </Link>
