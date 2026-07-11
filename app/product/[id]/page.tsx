@@ -1,4 +1,5 @@
-﻿import Link from "next/link";
+﻿import { renderWithBold } from "@/lib/renderWithBold";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProduct, formatINR, CATEGORY_META, localizedName, localizedDescription } from "@/lib/products";
 import { getReviews, getRatingSummary } from "@/lib/reviews";
@@ -137,7 +138,7 @@ export default async function ProductPage({
             {formatINR(product.price)}
           </div>
           {displayDesc && (
-            <p className="mb-6 max-w-md whitespace-pre-wrap text-ink-soft">{displayDesc}</p>
+            <p className="mb-6 max-w-md whitespace-pre-wrap text-ink-soft">{renderWithBold(displayDesc)}</p>
           )}
 
           {canBuy && remaining !== null && (
