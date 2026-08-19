@@ -68,7 +68,7 @@ export default async function Navbar() {
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden items-center gap-5 text-[0.92rem] md:flex lg:gap-7 xl:gap-8">
+        <div className="hidden items-center gap-4 whitespace-nowrap text-[0.86rem] lg:flex xl:gap-6 xl:text-[0.92rem]">
           <Link href="/" className="nav-link">
             {t.home}
           </Link>
