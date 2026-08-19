@@ -85,6 +85,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <CartProvider>
       <html lang={locale} className={fraunces.variable + " " + mukta.variable}>
         <body>
+          {/* Without JS the scroll-reveal observer never runs, so make
+              revealed content visible for no-JS clients and crawlers. */}
+          <noscript>
+            <style>{".on-scroll{opacity:1 !important;transform:none !important}"}</style>
+          </noscript>
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(businessJsonLd) }}
