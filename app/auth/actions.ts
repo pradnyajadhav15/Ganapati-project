@@ -90,6 +90,12 @@ export async function requestPasswordReset(formData: FormData) {
     email,
   });
 
+  if (error) {
+    // Includes the ordinary "no such user" case, which must stay invisible to
+    // the caller — see the redirect at the end.
+    console.warn("generateLink(recovery) failed:", error.message);
+  }
+
   const tokenHash = data?.properties?.hashed_token;
   if (!error && tokenHash) {
     const resetUrl =
@@ -104,10 +110,15 @@ export async function requestPasswordReset(formData: FormData) {
   // Fall back to Supabase's own mailer if we could not send — better a link
   // that may land awkwardly than no email at all.
   if (!delivered) {
+    console.warn("Falling back to Supabase recovery mail for", email);
     const supabase = createSupabaseServerClient();
-    await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: siteUrl + "/auth/confirm?next=/reset-password",
-    });
+    const { error: fallbackError } = await supabase.auth.resetPasswordForEmail(
+      email,
+      { redirectTo: siteUrl + "/auth/confirm?next=/reset-password" }
+    );
+    if (fallbackError) {
+      console.error("Fallback recovery mail also failed:", fallbackError.message);
+    }
   }
 
   // Always report the same result. Telling the visitor whether an account

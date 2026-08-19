@@ -259,16 +259,37 @@ export async function sendPasswordResetEmail(input: {
 
   try {
     const resend = new Resend(apiKey);
-    await resend.emails.send({
+    // The SDK resolves with { data, error } and only throws on transport
+    // failures, so the error field has to be checked explicitly. Missing it
+    // would report success for a mail that was never accepted, and the caller
+    // would skip its fallback — leaving the customer with no email at all.
+    const { data, error } = await resend.emails.send({
       from,
       to: [input.to],
       subject: "Reset your R. Ramesh Arts Studio password",
       text,
       html,
     });
+
+    if (error) {
+      console.error(
+        "Password reset email rejected by Resend:",
+        error.name,
+        error.statusCode,
+        error.message,
+        "(from: " + from + ")"
+      );
+      return false;
+    }
+
+    if (!data?.id) {
+      console.error("Password reset email returned no id; treating as failed.");
+      return false;
+    }
+
     return true;
   } catch (err) {
-    console.error("Password reset email failed:", err);
+    console.error("Password reset email failed to send:", err);
     return false;
   }
 }
