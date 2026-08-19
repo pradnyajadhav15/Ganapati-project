@@ -212,3 +212,63 @@ export async function notifyOwnerOfSoldOut(productName: string) {
     return { ok: false };
   }
 }
+/**
+ * Sends a password reset link that points at our own domain.
+ *
+ * Supabase's own recovery mail routes the user through its /verify endpoint,
+ * which then redirects to whatever the project's Site URL / redirect allow
+ * list resolves to — a setting this app cannot control from code. Minting the
+ * token here and building the link ourselves keeps the destination under our
+ * control, so the flow cannot be redirected somewhere unexpected.
+ *
+ * Returns false when Resend is not configured, so the caller can fall back to
+ * Supabase's mailer rather than silently sending nothing.
+ */
+export async function sendPasswordResetEmail(input: {
+  to: string;
+  resetUrl: string;
+}): Promise<boolean> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn("Password reset email skipped: RESEND_API_KEY not set.");
+    return false;
+  }
+
+  const from =
+    process.env.AUTH_EMAIL_FROM || "R. Ramesh Arts <orders@rramesharts.com>";
+
+  const text =
+    "Namaskar,\n\n" +
+    "We received a request to reset the password for your R. Ramesh Arts Studio account.\n\n" +
+    "Open this link to choose a new password:\n" +
+    input.resetUrl +
+    "\n\nThe link can be used once and expires shortly.\n" +
+    "If you did not ask for this, you can ignore this email — your password stays unchanged.\n\n" +
+    "R. Ramesh Arts Studio, Solapur";
+
+  const html =
+    '<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#33291F">' +
+    '<h1 style="font-size:20px;margin:0 0 16px">Reset your password</h1>' +
+    '<p style="margin:0 0 16px;line-height:1.6">We received a request to reset the password for your R. Ramesh Arts Studio account.</p>' +
+    '<p style="margin:0 0 28px"><a href="' +
+    input.resetUrl +
+    '" style="display:inline-block;background:#33291F;color:#FBF6EE;text-decoration:none;padding:12px 24px;border-radius:999px;font-weight:600">Choose a new password</a></p>' +
+    '<p style="margin:0 0 16px;font-size:13px;color:#6B5D4F;line-height:1.6">The link can be used once and expires shortly. If you did not ask for this, ignore this email — your password stays unchanged.</p>' +
+    '<p style="margin:24px 0 0;font-size:12px;color:#6B5D4F">R. Ramesh Arts Studio, Solapur</p>' +
+    "</div>";
+
+  try {
+    const resend = new Resend(apiKey);
+    await resend.emails.send({
+      from,
+      to: [input.to],
+      subject: "Reset your R. Ramesh Arts Studio password",
+      text,
+      html,
+    });
+    return true;
+  } catch (err) {
+    console.error("Password reset email failed:", err);
+    return false;
+  }
+}

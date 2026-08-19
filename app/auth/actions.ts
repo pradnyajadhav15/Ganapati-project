@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
+import { supabaseAdmin } from "@/lib/supabase-admin";
+import { sendPasswordResetEmail } from "@/lib/email";
 
 export async function signUp(formData: FormData) {
   const supabase = createSupabaseServerClient();
@@ -69,20 +71,47 @@ function getSiteUrl(): string {
 }
 
 export async function requestPasswordReset(formData: FormData) {
-  const supabase = createSupabaseServerClient();
-  const email = String(formData.get("email"));
+  const email = String(formData.get("email")).trim();
+  const siteUrl = getSiteUrl();
 
-  // Land on /auth/confirm, not /reset-password: the recovery link carries a
-  // one-time code that has to be exchanged for a session cookie before the
-  // user can change their password. /reset-password cannot do that itself —
-  // it is a page, and only a route handler can write the cookie.
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: getSiteUrl() + "/auth/confirm?next=/reset-password",
+  // Mint the recovery token ourselves and mail it from our own domain.
+  //
+  // Supabase's resetPasswordForEmail routes the user through its /verify
+  // endpoint, which then redirects to whatever the project's Site URL and
+  // redirect allow list resolve to. That is dashboard configuration this app
+  // cannot set, and when it is wrong the user is sent somewhere they cannot
+  // finish the reset. Building the link here keeps the destination ours.
+  //
+  // /auth/confirm turns the token_hash into a session, then forwards to the
+  // password form.
+  let delivered = false;
+  const { data, error } = await supabaseAdmin.auth.admin.generateLink({
+    type: "recovery",
+    email,
   });
 
-  if (error) {
-    redirect("/forgot-password?error=" + encodeURIComponent(error.message));
+  const tokenHash = data?.properties?.hashed_token;
+  if (!error && tokenHash) {
+    const resetUrl =
+      siteUrl +
+      "/auth/confirm?token_hash=" +
+      encodeURIComponent(tokenHash) +
+      "&type=recovery&next=" +
+      encodeURIComponent("/reset-password");
+    delivered = await sendPasswordResetEmail({ to: email, resetUrl });
   }
+
+  // Fall back to Supabase's own mailer if we could not send — better a link
+  // that may land awkwardly than no email at all.
+  if (!delivered) {
+    const supabase = createSupabaseServerClient();
+    await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: siteUrl + "/auth/confirm?next=/reset-password",
+    });
+  }
+
+  // Always report the same result. Telling the visitor whether an account
+  // exists would let anyone probe the customer list for valid addresses.
   redirect("/forgot-password?sent=1");
 }
 
