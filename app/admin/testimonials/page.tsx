@@ -1,4 +1,5 @@
 ﻿import Link from "next/link";
+import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase-admin";
@@ -133,9 +134,12 @@ export default async function AdminTestimonialsPage() {
 
               <form action={deleteTestimonial} className="mt-3 border-t border-line pt-3">
                 <input type="hidden" name="id" value={item.id} />
-                <button type="submit" className="text-sm text-rose underline">
+                <ConfirmSubmitButton
+                  confirmMessage={"Delete the testimonial from " + item.customer_name + "? This cannot be undone."}
+                  className="text-sm text-rose underline"
+                >
                   Delete this testimonial
-                </button>
+                </ConfirmSubmitButton>
               </form>
             </div>
           ))}

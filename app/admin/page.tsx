@@ -1,7 +1,8 @@
 ﻿import Link from "next/link";
+import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 import Image from "next/image";
 import { getProducts, formatINR, CATEGORY_META } from "@/lib/products";
-import { deleteProduct, logout, setOrderingStatus } from "./actions";
+import { deleteProduct, setOrderingStatus, toggleProductStock } from "./actions";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export const dynamic = "force-dynamic";
@@ -26,47 +27,9 @@ export default async function AdminPage() {
           <h1 className="text-3xl">Products</h1>
           <p className="text-ink-soft">{products.length} idols in catalogue</p>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <Link href="/admin/orders" className="btn-ghost">
-            View Orders
-          </Link>
-          <Link href="/admin/today" className="btn-ghost">
-            Today
-          </Link>
-          <Link href="/admin/bookings" className="btn-ghost">
-            Pre-bookings
-          </Link>
-          <Link href="/admin/messages" className="btn-ghost">
-            Messages
-          </Link>
-          <Link href="/admin/subscribers" className="btn-ghost">
-            Subscribers
-          </Link>
-          <Link href="/admin/accessories" className="btn-ghost">
-            Accessories
-          </Link>
-          <Link href="/admin/testimonials" className="btn-ghost">
-            Testimonials
-          </Link>
-           <Link href="/admin/coupons" className="btn-ghost">
-            Coupons
-          </Link>
-            <Link href="/admin/team" className="btn-ghost">
-            Team
-          </Link>
-          <Link href="/admin/gallery" className="btn-ghost">
-            Gallery
-          </Link>
-          <Link href="/admin/blog" className="btn-ghost">
-            Blog
-          </Link>
-          <Link href="/admin/products/new" className="btn-primary">
-            + Add Product
-          </Link>
-          <form action={logout}>
-            <button className="btn-ghost">Log out</button>
-          </form>
-        </div>
+        <Link href="/admin/products/new" className="btn-primary">
+          + Add Product
+        </Link>
       </div>
 
       <form action={setOrderingStatus} className="mb-8 rounded-xl2 border border-line bg-white p-6">
@@ -96,6 +59,7 @@ export default async function AdminPage() {
               <th className="p-4">Idol</th>
               <th className="p-4">Category</th>
               <th className="p-4">Price</th>
+              <th className="p-4">Stock</th>
               <th className="p-4 text-right">Action</th>
             </tr>
           </thead>
@@ -118,20 +82,41 @@ export default async function AdminPage() {
                 </td>
                 <td className="p-4 text-ink-soft">{CATEGORY_META[p.category]?.title}</td>
                 <td className="p-4">{formatINR(p.price)}</td>
+                <td className="p-4">
+                  <form action={toggleProductStock}>
+                    <input type="hidden" name="id" value={p.id} />
+                    <input type="hidden" name="in_stock" value={p.in_stock ? "0" : "1"} />
+                    <button
+                      type="submit"
+                      title={p.in_stock ? "Mark sold out" : "Mark back in stock"}
+                      className={
+                        "rounded-full px-3 py-1 text-xs font-semibold transition " +
+                        (p.in_stock
+                          ? "bg-sage/25 text-sage-deep hover:bg-sage/40"
+                          : "bg-rose text-ink hover:bg-rose/80")
+                      }
+                    >
+                      {p.in_stock ? "In stock" : "Sold out"}
+                    </button>
+                  </form>
+                </td>
                 <td className="p-4 text-right">
                   <Link href={"/admin/products/" + p.id + "/edit"} className="mr-2 rounded-full border border-line px-4 py-1.5 text-xs font-semibold text-sage-deep transition hover:bg-cream-deep">Edit</Link>
                   <form action={deleteProduct} className="inline">
                     <input type="hidden" name="id" value={p.id} />
-                    <button className="rounded-full border border-red-300 px-4 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50">
+                    <ConfirmSubmitButton
+                      confirmMessage={"Remove " + p.name + " from the catalogue? This cannot be undone."}
+                      className="rounded-full border border-red-300 px-4 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50"
+                    >
                       Remove
-                    </button>
+                    </ConfirmSubmitButton>
                   </form>
                 </td>
               </tr>
             ))}
             {!products.length && (
               <tr>
-                <td colSpan={4} className="p-8 text-center text-ink-soft">
+                <td colSpan={5} className="p-8 text-center text-ink-soft">
                   No products yet. Click "Add Product" to create your first idol.
                 </td>
               </tr>

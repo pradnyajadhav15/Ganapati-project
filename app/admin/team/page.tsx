@@ -1,4 +1,5 @@
 ﻿import Link from "next/link";
+import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase-admin";
@@ -48,7 +49,12 @@ export default async function AdminTeamPage() {
               </form>
               <form action={deleteTeamMember}>
                 <input type="hidden" name="id" value={m.id} />
-                <button type="submit" className="rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-600">Remove</button>
+                <ConfirmSubmitButton
+                  confirmMessage="Remove this team member? This cannot be undone."
+                  className="rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-600"
+                >
+                  Remove
+                </ConfirmSubmitButton>
               </form>
             </div>
           ))}
