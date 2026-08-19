@@ -100,7 +100,7 @@ export default async function ProductPage({
 
   return (
     <>
-      <section className="site-wrap grid gap-10 py-16 md:grid-cols-2">
+      <section className="site-wrap grid gap-12 py-16 md:grid-cols-2">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
@@ -134,8 +134,11 @@ export default async function ProductPage({
             </div>
           )}
 
-          <div className="my-4 font-display text-3xl text-terracotta">
-            {formatINR(product.price)}
+          <div className="my-5">
+            <div className="rule-gold mb-5" />
+            <div className="font-display text-[2.1rem] font-semibold leading-none text-terracotta-deep">
+              {formatINR(product.price)}
+            </div>
           </div>
           {displayDesc && (
             <p className="mb-6 max-w-md whitespace-pre-wrap text-ink-soft">{renderWithBold(displayDesc)}</p>
@@ -163,6 +166,27 @@ export default async function ProductPage({
           ) : (
             <p className="mt-4 rounded-lg border border-line bg-cream-deep px-4 py-3 text-sm text-ink-soft">{ordering.message || "We are not taking new orders right now - you can pre-book below for the next batch."}</p>
           )}
+
+          {/* reassurance strip */}
+          <ul className="mt-7 grid grid-cols-1 gap-3 border-t border-line-soft pt-6 sm:grid-cols-3">
+            {[
+              { t: "Hand-finished", d: "Painted and checked by our artisans" },
+              { t: "Safe delivery", d: "Packed to travel without cracks" },
+              { t: "Talk to us", d: "WhatsApp us before you buy" },
+            ].map((item) => (
+              <li key={item.t} className="flex items-start gap-2.5">
+                <span className="mt-1 grid h-5 w-5 flex-none place-items-center rounded-full bg-sage/25 text-sage-deep">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
+                    <path d="m5 12 5 5L20 7" />
+                  </svg>
+                </span>
+                <span>
+                  <span className="block text-[0.82rem] font-semibold text-ink">{item.t}</span>
+                  <span className="block text-[0.76rem] leading-snug text-ink-soft">{item.d}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
 
           <PreBookForm
             productId={product.id}

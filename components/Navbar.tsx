@@ -1,9 +1,10 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import Image from "next/image";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import CartIcon from "@/components/CartIcon";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import MobileMenu from "@/components/MobileMenu";
+import NavShell from "@/components/NavShell";
 import { getDict, type Dict } from "@/lib/i18n";
 import { getLocale } from "@/lib/locale";
 
@@ -37,59 +38,69 @@ export default async function Navbar() {
   const linkItems = links.map((l) => ({ href: l.href, label: t[l.key as keyof Dict] }));
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-line bg-cream/90 backdrop-blur-md">
-      <div className="site-wrap flex h-[78px] items-center justify-between">
+    <NavShell>
+      <div className="site-wrap flex h-[78px] items-center justify-between gap-6">
         {/* Brand */}
-        <Link href="/" className="flex items-center gap-3">
-          <div className="relative h-[50px] w-[50px] overflow-hidden rounded-full border-[1.5px] border-ink">
-            <Image
-              src="/images/logo.png"
-              alt="R. Ramesh Arts Studio logo"
-              fill
-              sizes="46px"
-              className="object-cover"
-              priority
-            />
-          </div>
+        <Link href="/" className="group flex shrink-0 items-center gap-3.5">
+          <span className="relative grid h-[52px] w-[52px] place-items-center">
+            {/* gold ring */}
+            <span className="absolute inset-0 rounded-full bg-gold-sheen opacity-80 transition-opacity duration-500 group-hover:opacity-100" />
+            <span className="absolute inset-[1.5px] rounded-full bg-cream" />
+            <span className="relative h-[46px] w-[46px] overflow-hidden rounded-full">
+              <Image
+                src="/images/logo.png"
+                alt="R. Ramesh Arts Studio logo"
+                fill
+                sizes="46px"
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                priority
+              />
+            </span>
+          </span>
           <span className="leading-none">
-            <b className="block font-display text-[1.05rem] font-semibold tracking-wide">
+            <b className="block font-display text-[1.08rem] font-semibold tracking-wide text-ink">
               R. Ramesh Arts
             </b>
-            <span className="block text-[0.62rem] uppercase tracking-[0.42em] text-ink-soft">
+            <span className="mt-1 block text-[0.6rem] uppercase tracking-[0.42em] text-gold-deep/80">
               Studio
             </span>
           </span>
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden items-center gap-8 text-[0.92rem] md:flex">
-          <Link href="/" className="text-ink-soft transition hover:text-ink">
+        <div className="hidden items-center gap-5 text-[0.92rem] md:flex lg:gap-7 xl:gap-8">
+          <Link href="/" className="nav-link">
             {t.home}
           </Link>
 
           <div className="group relative">
-            <button className="text-ink-soft transition group-hover:text-ink">
-              {t.ourCollections} ⌄
+            <button className="nav-link inline-flex items-center gap-1.5">
+              {t.ourCollections}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3 transition-transform duration-300 group-hover:rotate-180">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
             </button>
-            <div className="invisible absolute left-[-16px] top-[130%] min-w-[200px] translate-y-2 rounded-2xl border border-line bg-white p-2 opacity-0 shadow-soft transition-all group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-              {collections.map((c) => (
-                <Link
-                  key={c.href}
-                  href={c.href}
-                  className="block rounded-lg px-3.5 py-2.5 text-[0.9rem] text-ink-soft hover:bg-cream-deep hover:text-ink"
-                >
-                  {t[c.key as keyof Dict]}
-                </Link>
-              ))}
+            <div className="invisible absolute left-[-18px] top-[150%] min-w-[228px] origin-top scale-95 rounded-2xl border border-line-soft bg-white/95 p-2 opacity-0 shadow-lift backdrop-blur-md transition-all duration-300 group-hover:visible group-hover:scale-100 group-hover:opacity-100">
+              <span className="absolute -top-1.5 left-9 h-3 w-3 rotate-45 border-l border-t border-line-soft bg-white" />
+              <div className="relative">
+                {collections.map((c) => (
+                  <Link
+                    key={c.href}
+                    href={c.href}
+                    className="group/i flex items-center justify-between rounded-xl px-3.5 py-2.5 text-[0.9rem] text-ink-soft transition-colors duration-200 hover:bg-cream-deep hover:text-ink"
+                  >
+                    {t[c.key as keyof Dict]}
+                    <span className="translate-x-[-4px] text-gold opacity-0 transition-all duration-300 group-hover/i:translate-x-0 group-hover/i:opacity-100">
+                      &rarr;
+                    </span>
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
 
           {links.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="text-ink-soft transition hover:text-ink"
-            >
+            <Link key={l.href} href={l.href} className="nav-link">
               {t[l.key as keyof Dict]}
             </Link>
           ))}
@@ -99,13 +110,13 @@ export default async function Navbar() {
         <div className="flex items-center gap-3 text-[0.92rem]">
           <LanguageSwitcher current={locale} />
           {user ? (
-            <Link href="/account" className="hidden text-ink-soft transition hover:text-ink sm:block">
+            <Link href="/account" className="nav-link hidden sm:block">
               {t.account}
             </Link>
           ) : (
             <Link
               href="/login"
-              className="hidden rounded-full border-[1.5px] border-ink px-4 py-1.5 text-ink transition hover:bg-ink hover:text-cream sm:block"
+              className="hidden rounded-full border-[1.5px] border-ink/80 px-4 py-1.5 font-medium text-ink transition-all duration-300 hover:-translate-y-0.5 hover:border-ink hover:bg-ink hover:text-cream hover:shadow-lux sm:block"
             >
               {t.logIn}
             </Link>
@@ -119,6 +130,6 @@ export default async function Navbar() {
           />
         </div>
       </div>
-    </nav>
+    </NavShell>
   );
 }

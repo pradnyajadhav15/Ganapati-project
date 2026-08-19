@@ -2,31 +2,181 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   BASE
+   ============================================================ */
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
   body {
     @apply bg-cream text-ink font-body antialiased;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    text-rendering: optimizeLegibility;
   }
   h1, h2, h3 {
     @apply font-display tracking-tight;
+    font-variant-ligatures: common-ligatures;
+  }
+  h1 { letter-spacing: -0.022em; }
+  h2 { letter-spacing: -0.018em; }
+
+  ::selection {
+    background: theme("colors.gold" / 28%);
+    color: theme("colors.ink-deep");
+  }
+
+  :focus-visible {
+    outline: 2px solid theme("colors.gold");
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* Refined scrollbar (desktop) */
+  @media (min-width: 768px) {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: theme("colors.line") transparent;
+    }
+    ::-webkit-scrollbar { width: 11px; height: 11px; }
+    ::-webkit-scrollbar-track { background: theme("colors.cream-deep"); }
+    ::-webkit-scrollbar-thumb {
+      background: theme("colors.line");
+      border: 3px solid theme("colors.cream-deep");
+      border-radius: 99px;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: theme("colors.terracotta"); }
   }
 }
 
+/* ============================================================
+   COMPONENTS
+   ============================================================ */
 @layer components {
   .site-wrap {
     @apply mx-auto max-w-site px-7;
   }
+
+  /* ---------- Buttons: light sweep on hover ---------- */
+  .btn-primary,
+  .btn-ghost,
+  .btn-gold {
+    @apply relative inline-flex items-center justify-center gap-2 overflow-hidden
+           rounded-full px-8 py-3.5 text-sm font-semibold;
+    transition: transform .45s cubic-bezier(.2,.7,.2,1),
+                box-shadow .45s cubic-bezier(.2,.7,.2,1),
+                background-color .35s ease, color .35s ease, border-color .35s ease;
+  }
+  .btn-primary::after,
+  .btn-ghost::after,
+  .btn-gold::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.38) 50%, transparent 65%);
+    transform: translateX(-120%);
+    transition: transform .8s cubic-bezier(.2,.7,.2,1);
+    pointer-events: none;
+  }
+  .btn-primary:hover::after,
+  .btn-ghost:hover::after,
+  .btn-gold:hover::after { transform: translateX(120%); }
+
   .btn-primary {
-    @apply rounded-full bg-ink px-8 py-3.5 text-sm font-semibold text-cream
-           transition hover:-translate-y-0.5 hover:shadow-soft;
+    @apply bg-ink-sheen text-cream shadow-lux;
   }
+  .btn-primary:hover {
+    @apply -translate-y-0.5 shadow-lift;
+  }
+  .btn-primary:active { transform: translateY(0) scale(.985); }
+
   .btn-ghost {
-    @apply rounded-full border-[1.5px] border-ink px-8 py-3.5 text-sm font-semibold
-           text-ink transition hover:bg-ink hover:text-cream;
+    @apply border-[1.5px] border-ink/85 text-ink;
   }
+  .btn-ghost:hover {
+    @apply -translate-y-0.5 border-ink bg-ink text-cream shadow-lux;
+  }
+  .btn-ghost:active { transform: translateY(0) scale(.985); }
+
+  .btn-gold {
+    @apply bg-gold-sheen text-ink-deep shadow-lux;
+    background-size: 200% auto;
+  }
+  .btn-gold:hover {
+    @apply -translate-y-0.5 shadow-glow;
+    background-position: right center;
+  }
+  .btn-gold:active { transform: translateY(0) scale(.985); }
+
+  /* ---------- Kicker / eyebrow ---------- */
   .kicker {
-    @apply text-[0.76rem] uppercase tracking-[0.34em] text-gold;
+    @apply text-[0.76rem] uppercase tracking-luxe text-gold;
   }
+
+  /* ---------- Gold gradient text ---------- */
+  .gold-text {
+    @apply bg-gold-sheen bg-clip-text text-transparent;
+    background-size: 200% auto;
+  }
+
+  /* ---------- Ornamental rule: line · diamond · line ---------- */
+  .ornament {
+    @apply flex items-center justify-center gap-3;
+  }
+  .ornament::before,
+  .ornament::after {
+    content: "";
+    height: 1px;
+    width: clamp(28px, 8vw, 68px);
+    background: linear-gradient(90deg, transparent, theme("colors.gold" / 70%));
+  }
+  .ornament::after { background: linear-gradient(90deg, theme("colors.gold" / 70%), transparent); }
+
+  /* ---------- Premium surfaces ---------- */
+  .card-lux {
+    @apply relative rounded-xl2 border border-line-soft bg-white shadow-lux;
+    transition: transform .55s cubic-bezier(.2,.7,.2,1), box-shadow .55s cubic-bezier(.2,.7,.2,1),
+                border-color .45s ease;
+  }
+  .card-lux:hover {
+    @apply -translate-y-1.5 border-gold/35 shadow-lift;
+  }
+
+  .glass {
+    background: rgba(253, 250, 244, .72);
+    backdrop-filter: saturate(180%) blur(14px);
+    -webkit-backdrop-filter: saturate(180%) blur(14px);
+  }
+
+  /* ---------- Hairline gold divider ---------- */
+  .rule-gold {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, theme("colors.gold" / 45%), transparent);
+  }
+
+  /* ---------- Underline-grow nav link ---------- */
+  .nav-link {
+    @apply relative text-ink-soft transition-colors duration-300 hover:text-ink;
+  }
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    height: 1.5px;
+    width: 100%;
+    background: linear-gradient(90deg, theme("colors.gold"), theme("colors.terracotta"));
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform .45s cubic-bezier(.2,.7,.2,1);
+  }
+  .nav-link:hover::after { transform: scaleX(1); transform-origin: left; }
 }
+
+/* ============================================================
+   MOTION
+   ============================================================ */
 
 /* page-load reveal */
 @keyframes rise {
@@ -34,3 +184,47 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 .reveal { animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+/* staggered page-load reveal for hero children */
+.reveal-stagger > * { animation: rise .85s cubic-bezier(.2,.7,.2,1) both; }
+.reveal-stagger > *:nth-child(1) { animation-delay: .05s; }
+.reveal-stagger > *:nth-child(2) { animation-delay: .16s; }
+.reveal-stagger > *:nth-child(3) { animation-delay: .27s; }
+.reveal-stagger > *:nth-child(4) { animation-delay: .38s; }
+.reveal-stagger > *:nth-child(5) { animation-delay: .49s; }
+
+/* scroll-triggered reveal (driven by components/Reveal.tsx) */
+.on-scroll {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity .95s cubic-bezier(.2,.7,.2,1), transform .95s cubic-bezier(.2,.7,.2,1);
+  will-change: opacity, transform;
+}
+.on-scroll.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* soft fade-up for image frames */
+.frame-lux {
+  position: relative;
+}
+.frame-lux::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.35), inset 0 0 60px rgba(51,41,31,.10);
+  pointer-events: none;
+}
+
+/* respect reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+  .on-scroll { opacity: 1; transform: none; }
+}

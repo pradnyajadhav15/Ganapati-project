@@ -1,5 +1,6 @@
 ﻿import { Suspense } from "react";
 import PageHero from "@/components/PageHero";
+import Reveal from "@/components/Reveal";
 import ProductCard from "@/components/ProductCard";
 import ShopControls from "@/components/ShopControls";
 import AccessoryGrid from "@/components/AccessoryGrid";
@@ -37,8 +38,10 @@ export default async function ShopPage({
 
         {products.length > 0 ? (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {products.map((p) => (
-              <ProductCard key={p.id} product={p} />
+            {products.map((p, i) => (
+              <Reveal key={p.id} delay={Math.min(i, 5) * 80}>
+                <ProductCard product={p} />
+              </Reveal>
             ))}
           </div>
         ) : (
@@ -46,14 +49,17 @@ export default async function ShopPage({
         )}
 
         {accessories.length > 0 && (
-          <div className="mt-16 border-t border-line pt-12">
-            <div className="mb-8 text-center">
-              <div className="mb-2 text-[0.72rem] uppercase tracking-[0.3em] text-sage-deep">{t.toolsAccessories}</div>
-              <h2 className="text-2xl">{t.ganpatiShastra}</h2>
-              <p className="mx-auto mt-2 max-w-md text-sm text-ink-soft">{t.shastraSub}</p>
-            </div>
+          <div className="mt-20 pt-14">
+            <div className="rule-gold mb-14" />
+            <Reveal className="mb-10 text-center">
+              <div className="ornament mb-3">
+                <span className="text-[0.72rem] uppercase tracking-[0.3em] text-sage-deep">{t.toolsAccessories}</span>
+              </div>
+              <h2 className="text-[clamp(1.6rem,3vw,2.2rem)]">{t.ganpatiShastra}</h2>
+              <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-ink-soft">{t.shastraSub}</p>
+            </Reveal>
             <AccessoryGrid accessories={accessories} />
-            <div className="mt-8 text-center">
+            <div className="mt-10 text-center">
               <a href="https://wa.me/917020290393" target="_blank" rel="noreferrer" className="btn-primary">{t.enquireWhatsApp}</a>
             </div>
           </div>
