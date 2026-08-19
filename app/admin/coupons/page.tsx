@@ -1,4 +1,5 @@
 ﻿import Link from "next/link";
+import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase-admin";
@@ -126,9 +127,12 @@ export default async function AdminCouponsPage() {
               </form>
               <form action={deleteCoupon} className="mt-3 border-t border-line pt-3">
                 <input type="hidden" name="id" value={c.id} />
-                <button type="submit" className="text-sm text-rose underline">
+                <ConfirmSubmitButton
+                  confirmMessage={"Delete the coupon " + c.code + "? Customers using it will stop getting the discount."}
+                  className="text-sm text-rose underline"
+                >
                   Delete this code
-                </button>
+                </ConfirmSubmitButton>
               </form>
             </div>
           ))}

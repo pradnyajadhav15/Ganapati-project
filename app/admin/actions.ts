@@ -82,6 +82,19 @@ export async function deleteProduct(formData: FormData) {
   revalidatePath("/");
 }
 
+export async function toggleProductStock(formData: FormData) {
+  const id = formData.get("id") as string;
+  const inStock = formData.get("in_stock") === "1";
+  const { error } = await supabaseAdmin
+    .from("products")
+    .update({ in_stock: inStock })
+    .eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin");
+  revalidatePath("/admin/overview");
+  revalidatePath("/");
+}
+
 export async function updateProduct(formData: FormData) {
   const id = formData.get("id") as string;
 

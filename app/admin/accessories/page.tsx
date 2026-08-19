@@ -1,4 +1,5 @@
 ﻿import Link from "next/link";
+import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase-admin";
@@ -147,9 +148,12 @@ export default async function AdminAccessoriesPage() {
 
               <form action={deleteAccessory} className="mt-3 border-t border-line pt-3">
                 <input type="hidden" name="id" value={a.id} />
-                <button type="submit" className="text-sm text-rose underline">
+                <ConfirmSubmitButton
+                  confirmMessage={"Delete the accessory \"" + a.name + "\"? This cannot be undone."}
+                  className="text-sm text-rose underline"
+                >
                   Delete this accessory
-                </button>
+                </ConfirmSubmitButton>
               </form>
             </div>
           ))}

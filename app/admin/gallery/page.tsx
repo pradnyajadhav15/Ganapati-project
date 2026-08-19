@@ -1,4 +1,5 @@
 ﻿import Link from "next/link";
+import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase-admin";
@@ -95,7 +96,12 @@ export default async function AdminGalleryPage() {
               </form>
               <form action={deleteGalleryImage} className="mt-3 border-t border-line pt-3">
                 <input type="hidden" name="id" value={g.id} />
-                <button type="submit" className="text-sm text-rose underline">Delete</button>
+                <ConfirmSubmitButton
+                  confirmMessage="Delete this gallery image? This cannot be undone."
+                  className="text-sm text-rose underline"
+                >
+                  Delete
+                </ConfirmSubmitButton>
               </form>
             </div>
           ))}
