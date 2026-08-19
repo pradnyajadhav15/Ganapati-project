@@ -45,7 +45,7 @@ A full-featured, multilingual e-commerce platform for **R. Ramesh Arts Studio**,
 | Payments | Razorpay |
 | Email | Resend |
 | PDF receipts | pdf-lib |
-| Hosting | Netlify (CI/CD from GitHub) |
+| Hosting | Vercel (CI/CD from GitHub) |
 
 ---
 
@@ -135,11 +135,16 @@ public/         # Images, fonts, icons
 
 ##  Deployment
 
-The site is deployed on **Netlify** with continuous deployment from the `main` branch:
+The site is deployed on **Vercel** with continuous deployment from the `main` branch:
 
-1. Push to `main` on GitHub → Netlify automatically builds and publishes.
-2. Environment variables are configured in **Netlify → Site configuration → Environment variables**.
-3. Custom domain (`rramesharts.com`) is managed via Netlify DNS with automatic HTTPS.
+1. Push to `main` on GitHub → Vercel automatically builds and publishes to production.
+2. Pull requests get their own preview deployment, linked from a comment on the PR.
+3. Environment variables are configured in **Vercel → Project Settings → Environment Variables**.
+4. Custom domain (`rramesharts.com`) is configured in **Vercel → Project Settings → Domains**, with automatic HTTPS.
+
+> **Every variable listed above must be set in Vercel.** The build calls Supabase while
+> pre-rendering pages, so a project missing `NEXT_PUBLIC_SUPABASE_URL` fails the build
+> outright with `supabaseUrl is required` rather than degrading at runtime.
 
 ---
 
