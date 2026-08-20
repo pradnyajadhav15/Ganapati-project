@@ -19,3 +19,19 @@ export async function getOrderingStatus(): Promise<OrderingStatus> {
   }
   return { open, message: (data.closed_message as string) || null };
 }
+
+/**
+ * Whether Cash on Delivery is offered. Stored in site_settings so the owner
+ * can turn it on and off from the admin without a deploy.
+ *
+ * Defaults to true if the row or column is missing, so a settings read failure
+ * cannot quietly disable a payment method the owner still wants.
+ */
+export async function getCodEnabled(): Promise<boolean> {
+  const { data } = await supabaseAdmin
+    .from("site_settings")
+    .select("cod_enabled")
+    .eq("id", 1)
+    .maybeSingle();
+  return data?.cod_enabled !== false;
+}

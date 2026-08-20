@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabase-server";
 import CheckoutForm from "@/components/CheckoutForm";
 import { getLocale } from "@/lib/locale";
 import { getDict } from "@/lib/i18n";
+import { getCodEnabled } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Checkout — R. Ramesh Arts Studio" };
@@ -26,5 +27,6 @@ export default async function CheckoutPage() {
   }
 
   const defaultName = (user.user_metadata?.full_name as string) || "";
-  return <CheckoutForm defaultName={defaultName} />;
+  const codEnabled = await getCodEnabled();
+  return <CheckoutForm defaultName={defaultName} codEnabled={codEnabled} />;
 }

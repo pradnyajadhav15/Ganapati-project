@@ -161,9 +161,11 @@ export async function setOrderingStatus(formData: FormData) {
   const msgRaw = formData.get("closed_message");
   const closed_message = msgRaw && String(msgRaw).trim() !== "" ? String(msgRaw).trim() : null;
 
+  const cod_enabled = formData.get("cod_enabled") === "on";
+
   const { error } = await supabaseAdmin
     .from("site_settings")
-    .update({ ordering_open, order_cutoff, closed_message })
+    .update({ ordering_open, order_cutoff, closed_message, cod_enabled })
     .eq("id", 1);
   if (error) throw new Error(error.message);
 

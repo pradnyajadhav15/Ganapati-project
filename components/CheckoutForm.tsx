@@ -28,7 +28,13 @@ function loadRazorpayScript(): Promise<boolean> {
 
 type Method = "razorpay" | "upi" | "cod";
 
-export default function CheckoutForm({ defaultName }: { defaultName: string }) {
+export default function CheckoutForm({
+  defaultName,
+  codEnabled,
+}: {
+  defaultName: string;
+  codEnabled: boolean;
+}) {
   const { items, total, count, remove, clear, ready } = useCart();
   const { t } = useLocale();
   const router = useRouter();
@@ -263,7 +269,9 @@ export default function CheckoutForm({ defaultName }: { defaultName: string }) {
               {[
                 { id: "razorpay" as Method, title: "Card / UPI / Netbanking", sub: "Pay online securely (Razorpay)" },
                 { id: "upi" as Method, title: "UPI - Scan & Pay", sub: "Scan our QR with any UPI app" },
-                { id: "cod" as Method, title: "Cash on Delivery", sub: "Pay when you receive the idol" },
+                ...(codEnabled
+                  ? [{ id: "cod" as Method, title: "Cash on Delivery", sub: "Pay when you receive the idol" }]
+                  : []),
               ].map((m) => (
                 <label key={m.id} className={"flex cursor-pointer items-start gap-3 rounded-xl border-2 px-4 py-3 transition " + (method === m.id ? "border-sage-deep bg-cream-deep" : "border-line")}>
                   <input type="radio" name="method" className="mt-1" checked={method === m.id} onChange={() => setMethod(m.id)} />
