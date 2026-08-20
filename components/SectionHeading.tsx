@@ -1,4 +1,5 @@
 import Reveal from "@/components/Reveal";
+import { DurvaMark } from "@/components/Botanical";
 
 export default function SectionHeading({
   kicker,
@@ -20,10 +21,10 @@ export default function SectionHeading({
         <span className="kicker">{kicker}</span>
       </div>
       <h2 className={"text-[clamp(2rem,3.5vw,2.9rem)] leading-[1.08] " + titleColor}>{title}</h2>
-      <div className="mx-auto mt-5 flex items-center justify-center gap-2" aria-hidden="true">
-        <span className="h-px w-10 bg-gradient-to-r from-transparent to-gold/60" />
-        <span className="h-1.5 w-1.5 rotate-45 bg-gold/70" />
-        <span className="h-px w-10 bg-gradient-to-l from-transparent to-gold/60" />
+      <div className="mx-auto mt-5 flex items-center justify-center gap-3" aria-hidden="true">
+        <span className="h-px w-12 bg-gradient-to-r from-transparent to-gold/55" />
+        <DurvaMark className="h-5 w-8 flex-none text-gold" />
+        <span className="h-px w-12 bg-gradient-to-l from-transparent to-gold/55" />
       </div>
       {sub && <p className={"mx-auto mt-5 max-w-xl leading-relaxed " + subColor}>{sub}</p>}
     </Reveal>

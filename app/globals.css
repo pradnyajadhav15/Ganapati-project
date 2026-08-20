@@ -232,6 +232,20 @@
   pointer-events: none;
 }
 
+/* marigold petals over the order confirmation */
+@keyframes petal-drift {
+  0%   { transform: translate3d(0, -12vh, 0) rotate(0deg); opacity: 0; }
+  8%   { opacity: 0.85; }
+  92%  { opacity: 0.85; }
+  100% { transform: translate3d(var(--drift, 0), 108vh, 0) rotate(var(--spin, 180deg)); opacity: 0; }
+}
+.petal {
+  animation-name: petal-drift;
+  animation-timing-function: cubic-bezier(.35, .1, .5, 1);
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+
 /* respect reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -241,4 +255,6 @@
     transition-duration: .001ms !important;
   }
   .on-scroll { opacity: 1; transform: none; }
+  /* a petal frozen mid-air is worse than no petal */
+  .petal-fall { display: none; }
 }

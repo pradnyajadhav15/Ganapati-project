@@ -1,4 +1,5 @@
 import Link from "next/link";
+import PetalFall from "@/components/PetalFall";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { formatINR } from "@/lib/format";
 import { getLocale } from "@/lib/locale";
@@ -24,8 +25,9 @@ export default async function OrderSuccessPage({
     : { data: [] };
 
   return (
-    <section className="site-wrap py-20">
-      <div className="mx-auto max-w-lg rounded-xl border border-line bg-white p-8 text-center shadow-soft">
+    <section className="relative site-wrap py-20">
+      <PetalFall />
+      <div className="relative z-10 mx-auto max-w-lg rounded-xl border border-line bg-white p-8 text-center shadow-soft">
         <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full bg-sage text-3xl">
           &#10003;
         </div>

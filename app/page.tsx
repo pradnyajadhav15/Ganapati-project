@@ -5,6 +5,7 @@ import ProductCard from "@/components/ProductCard";
 import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/Reveal";
 import SeasonCountdown from "@/components/SeasonCountdown";
+import { Lotus, Jaswand } from "@/components/Botanical";
 import AccessoryGrid from "@/components/AccessoryGrid";
 import { getProducts } from "@/lib/products";
 import { getAccessories } from "@/lib/accessories";
@@ -299,6 +300,8 @@ export default async function Home() {
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_500px_at_85%_30%,rgba(242,201,168,.40),transparent_62%),radial-gradient(700px_420px_at_5%_85%,rgba(175,194,168,.28),transparent_65%)]"
         />
+        {/* botanical wash — texture, not decoration, so it stays very faint */}
+        <Lotus className="pointer-events-none absolute -left-16 bottom-4 hidden w-[420px] text-sage-deep/[0.07] md:block" />
         <div className="site-wrap relative grid items-center gap-14 md:grid-cols-[0.9fr_1.1fr]">
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full border border-terracotta/25 bg-terracotta/10 px-4 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-terracotta-deep">

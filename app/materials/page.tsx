@@ -2,6 +2,7 @@ import Link from "next/link";
 import PageHero from "@/components/PageHero";
 import Reveal from "@/components/Reveal";
 import { MATERIALS } from "@/lib/materials";
+import { CornerSpray } from "@/components/Botanical";
 import { getProducts, formatINR } from "@/lib/products";
 import { getLocale } from "@/lib/locale";
 
@@ -98,7 +99,8 @@ export default async function MaterialsPage() {
             const price = priceFor(m.category);
             return (
               <Reveal key={m.category} delay={i * 80}>
-                <div className={"h-full rounded-xl3 border border-line-soft p-7 shadow-lux ring-1 " + m.ring + " " + m.tint}>
+                <div className={"relative h-full overflow-hidden rounded-xl3 border border-line-soft p-7 shadow-lux ring-1 " + m.ring + " " + m.tint}>
+                  <CornerSpray className={"pointer-events-none absolute -right-4 -top-4 w-28 opacity-30 " + m.accent} />
                   <h2 className={"font-display text-[1.6rem] leading-tight " + m.accent}>
                     {m.name[locale] ?? m.name.en}
                   </h2>
