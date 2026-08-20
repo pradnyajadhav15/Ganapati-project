@@ -1,6 +1,7 @@
 import Link from "next/link";
 import PageHero from "@/components/PageHero";
 import Reveal from "@/components/Reveal";
+import { CornerSpray } from "@/components/Botanical";
 import { getLocale } from "@/lib/locale";
 
 export const metadata = {
@@ -143,7 +144,8 @@ export default function CarePage() {
           </div>
           <div className="grid gap-5 md:grid-cols-3">
             {t.visarjan.map((v) => (
-              <div key={v.h} className="rounded-xl2 border border-line-soft bg-cream-warm p-6">
+              <div key={v.h} className="relative overflow-hidden rounded-xl2 border border-line-soft bg-cream-warm p-6">
+                <CornerSpray className="pointer-events-none absolute -right-4 -top-4 w-24 text-gold opacity-30" />
                 <h3 className="text-[1.05rem]">{v.h}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-soft">{v.p}</p>
               </div>

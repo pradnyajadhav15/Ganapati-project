@@ -1,5 +1,6 @@
 import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/Reveal";
+import { Jaswand } from "@/components/Botanical";
 import { getTestimonials } from "@/lib/testimonials";
 import { getLocale } from "@/lib/locale";
 import { getDict } from "@/lib/i18n";
@@ -17,6 +18,8 @@ export default async function Testimonials() {
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(700px_360px_at_15%_0%,rgba(242,201,168,.45),transparent_65%),radial-gradient(700px_360px_at_85%_100%,rgba(175,194,168,.35),transparent_65%)]"
       />
+      <Jaswand stroke className="pointer-events-none absolute -right-14 -top-10 hidden w-[300px] text-terracotta-deep/[0.09] lg:block" />
+      <Jaswand stroke className="pointer-events-none absolute -bottom-16 -left-16 hidden w-[240px] text-sage-deep/[0.08] lg:block" />
       <div className="site-wrap relative">
         <SectionHeading kicker={t.kindWords} title={t.customerSay} />
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

@@ -1,3 +1,5 @@
+import { DurvaMark } from "@/components/Botanical";
+
 export default function PageHero({
   kicker,
   title,
@@ -33,10 +35,10 @@ export default function PageHero({
           <span className="text-[0.74rem] uppercase tracking-luxe text-ink/65">{kicker}</span>
         </div>
         <h1 className="text-[clamp(2.4rem,5vw,3.9rem)] leading-[1.06] text-ink">{title}</h1>
-        <div className="mx-auto mt-5 flex items-center justify-center gap-2" aria-hidden="true">
-          <span className="h-px w-10 bg-gradient-to-r from-transparent to-ink/30" />
-          <span className="h-1.5 w-1.5 rotate-45 bg-ink/40" />
-          <span className="h-px w-10 bg-gradient-to-l from-transparent to-ink/30" />
+        <div className="mx-auto mt-5 flex items-center justify-center gap-3" aria-hidden="true">
+          <span className="h-px w-12 bg-gradient-to-r from-transparent to-ink/25" />
+          <DurvaMark className="h-5 w-8 flex-none text-ink/45" />
+          <span className="h-px w-12 bg-gradient-to-l from-transparent to-ink/25" />
         </div>
         {sub && (
           <p className="mx-auto mt-5 max-w-xl leading-relaxed text-ink/70">{sub}</p>
