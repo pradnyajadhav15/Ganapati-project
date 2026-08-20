@@ -96,3 +96,80 @@ export function MarigoldPetal({ className = "" }: { className?: string }) {
     </svg>
   );
 }
+
+/**
+ * A painted lotus, built from layered petals with soft gradients rather than
+ * flat fills, so it reads as artwork instead of an icon.
+ *
+ * `gid` must be unique per instance on a page — the gradients are referenced
+ * by id, and duplicates would make one bloom borrow another's colours.
+ */
+export function PaintedLotus({
+  className = "",
+  gid = "lot",
+}: {
+  className?: string;
+  gid?: string;
+}) {
+  // One petal, tip up, springing from the origin.
+  // Fuller petal than a simple lens — lotus petals are broad with a drawn tip.
+  const petal = "M0 0C-20-28-23-62 0-106 23-62 20-28 0 0Z";
+  // Kept under 70 degrees so the outer whorl still cups upward instead of
+  // lying flat, which read as a water lily rather than a lotus.
+  const back = [-68, -45, -22, 0, 22, 45, 68];
+  const front = [-38, -19, 0, 19, 38];
+  const inner = [-13, 0, 13];
+
+  return (
+    <svg viewBox="0 0 320 240" className={className} aria-hidden="true">
+      <defs>
+        <linearGradient id={gid + "-back"} x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stopColor="#B0466F" />
+          <stop offset="45%" stopColor="#D2769D" />
+          <stop offset="100%" stopColor="#F3CBDA" />
+        </linearGradient>
+        <linearGradient id={gid + "-front"} x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stopColor="#C0517D" />
+          <stop offset="40%" stopColor="#E091B2" />
+          <stop offset="100%" stopColor="#FBE2EB" />
+        </linearGradient>
+        <radialGradient id={gid + "-core"}>
+          <stop offset="0%" stopColor="#F6D98A" />
+          <stop offset="70%" stopColor="#E9B65E" />
+          <stop offset="100%" stopColor="#D89F4E" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+
+      <g transform="translate(160 186)">
+        {/* outer whorl, opened wide and sitting behind */}
+        <g fill={`url(#${gid}-back)`} opacity="0.85">
+          {back.map((deg) => (
+            <path key={"b" + deg} d={petal} transform={`rotate(${deg}) scale(1 0.96)`} />
+          ))}
+        </g>
+        {/* inner whorl, lighter and more upright */}
+        <g fill={`url(#${gid}-front)`}>
+          {front.map((deg) => (
+            <path key={"f" + deg} d={petal} transform={`rotate(${deg}) scale(0.78)`} />
+          ))}
+        </g>
+        {/* innermost whorl, still closing over the core */}
+        <g fill={`url(#${gid}-front)`} opacity="0.95">
+          {inner.map((deg) => (
+            <path key={"i" + deg} d={petal} transform={`rotate(${deg}) scale(0.5)`} />
+          ))}
+        </g>
+        {/* veins, only on the front petals, where they read */}
+        <g stroke="#C0517D" strokeWidth="0.9" strokeOpacity="0.28" fill="none" strokeLinecap="round">
+          {front.map((deg) => (
+            <g key={"v" + deg} transform={`rotate(${deg}) scale(0.78)`}>
+              <path d="M0-6C-3-28-4-52 0-92" />
+              <path d="M0-6C3-28 4-52 0-92" />
+            </g>
+          ))}
+        </g>
+        <circle r="15" fill={`url(#${gid}-core)`} />
+      </g>
+    </svg>
+  );
+}
