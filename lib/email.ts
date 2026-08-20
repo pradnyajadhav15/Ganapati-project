@@ -2,6 +2,65 @@
 import { Resend } from "resend";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
+const MAIL_FROM = "R. Ramesh Arts <orders@rramesharts.com>";
+
+/**
+ * Single place every outgoing email goes through.
+ *
+ * The Resend SDK resolves with { data, error } and only throws on transport
+ * failures, so `await resend.emails.send(...)` on its own reports success for
+ * mail the API rejected. Every sender here used to do that, which meant a
+ * rejected order or booking notification vanished without a trace.
+ *
+ * Returns whether the message was accepted, and logs why when it was not.
+ */
+async function sendMail(input: {
+  label: string;
+  to: string;
+  subject: string;
+  text: string;
+  html?: string;
+  from?: string;
+}): Promise<boolean> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn(input.label + " email skipped: RESEND_API_KEY not set.");
+    return false;
+  }
+
+  const from = input.from || MAIL_FROM;
+
+  try {
+    const resend = new Resend(apiKey);
+    const { data, error } = await resend.emails.send({
+      from,
+      to: [input.to],
+      subject: input.subject,
+      text: input.text,
+      ...(input.html ? { html: input.html } : {}),
+    });
+
+    if (error) {
+      console.error(
+        input.label + " email rejected by Resend:",
+        error.name,
+        error.statusCode,
+        error.message,
+        "(from: " + from + ", to: " + input.to + ")"
+      );
+      return false;
+    }
+    if (!data?.id) {
+      console.error(input.label + " email returned no id; treating as failed.");
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error(input.label + " email failed to send:", err);
+    return false;
+  }
+}
+
 export async function notifyOwnerOfOrder(orderId: string) {
   const apiKey = process.env.RESEND_API_KEY;
   const to = process.env.OWNER_EMAIL;
@@ -36,12 +95,11 @@ export async function notifyOwnerOfOrder(orderId: string) {
     "\nItems:\n" + lines.join("\n") + "\n\n" +
     "Total: Rs " + order.total;
 
-  const resend = new Resend(apiKey);
-  await resend.emails.send({
-    from: "R. Ramesh Arts <orders@rramesharts.com>",
-    to: [to],
+  await sendMail({
+    label: "Owner order",
+    to,
     subject: "New Order - Rs " + order.total + " from " + order.customer_name,
-    text: text,
+    text,
   });
 }
 
@@ -81,12 +139,11 @@ export async function notifyCustomerOfOrder(orderId: string, customerEmail: stri
     "Vighnaharta bless you!\n" +
     "R. Ramesh Arts Studio, Solapur";
 
-  const resend = new Resend(apiKey);
-  await resend.emails.send({
-    from: "R. Ramesh Arts <orders@rramesharts.com>",
-    to: [customerEmail],
+  await sendMail({
+    label: "Customer order",
+    to: customerEmail,
     subject: "Order Confirmed - #" + shortId + " - R. Ramesh Arts Studio",
-    text: text,
+    text,
   });
 }
 
@@ -108,19 +165,13 @@ export async function notifyOwnerOfContact(input: {
     "Email: " + input.email + "\n\n" +
     "Message:\n" + input.message;
 
-  try {
-    const resend = new Resend(apiKey);
-    await resend.emails.send({
-      from: "R. Ramesh Arts <orders@rramesharts.com>",
-      to: [to],
-      subject: "New enquiry from " + input.name,
-      text: text,
-    });
-    return { ok: true };
-  } catch (e) {
-    console.error("Contact email failed:", e);
-    return { ok: false };
-  }
+  const ok = await sendMail({
+    label: "Contact enquiry",
+    to,
+    subject: "New enquiry from " + input.name,
+    text,
+  });
+  return { ok };
 }
 
 export async function notifyOwnerOfBooking(bookingId: string) {
@@ -149,12 +200,11 @@ export async function notifyOwnerOfBooking(bookingId: string) {
     (b.notes ? "\nCustomer notes:\n" + b.notes + "\n" : "") +
     "\nFollow up with the customer to confirm and collect the advance.";
 
-  const resend = new Resend(apiKey);
-  await resend.emails.send({
-    from: "R. Ramesh Arts <orders@rramesharts.com>",
-    to: [to],
+  await sendMail({
+    label: "Owner pre-booking",
+    to,
     subject: "New Pre-booking - " + b.product_name + " from " + b.customer_name,
-    text: text,
+    text,
   });
 }
 
@@ -183,12 +233,11 @@ export async function notifyCustomerOfBooking(bookingId: string, customerEmail: 
     "Vighnaharta bless you!\n" +
     "R. Ramesh Arts Studio, Solapur";
 
-  const resend = new Resend(apiKey);
-  await resend.emails.send({
-    from: "R. Ramesh Arts <orders@rramesharts.com>",
-    to: [customerEmail],
+  await sendMail({
+    label: "Customer pre-booking",
+    to: customerEmail,
     subject: "Pre-booking Received - " + b.product_name + " - R. Ramesh Arts Studio",
-    text: text,
+    text,
   });
 }
 
@@ -198,20 +247,15 @@ export async function notifyOwnerOfSoldOut(productName: string) {
   const to = process.env.OWNER_EMAIL;
   if (!apiKey || !to) return { ok: false };
 
-  try {
-    const resend = new Resend(apiKey);
-    await resend.emails.send({
-      from: "R. Ramesh Arts <orders@rramesharts.com>",
-      to: [to],
-      subject: "Marked Sold Out: " + productName,
-      text: "You just marked \"" + productName + "\" as Sold Out. Update stock when restocked.",
-    });
-    return { ok: true };
-  } catch (e) {
-    console.error("Sold-out email failed:", e);
-    return { ok: false };
-  }
+  const ok = await sendMail({
+    label: "Sold-out",
+    to,
+    subject: "Marked Sold Out: " + productName,
+    text: "You just marked \"" + productName + "\" as Sold Out. Update stock when restocked.",
+  });
+  return { ok };
 }
+
 /**
  * Sends a password reset link that points at our own domain.
  *
@@ -228,14 +272,7 @@ export async function sendPasswordResetEmail(input: {
   to: string;
   resetUrl: string;
 }): Promise<boolean> {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    console.warn("Password reset email skipped: RESEND_API_KEY not set.");
-    return false;
-  }
-
-  const from =
-    process.env.AUTH_EMAIL_FROM || "R. Ramesh Arts <orders@rramesharts.com>";
+  const from = process.env.AUTH_EMAIL_FROM || MAIL_FROM;
 
   const text =
     "Namaskar,\n\n" +
@@ -257,39 +294,12 @@ export async function sendPasswordResetEmail(input: {
     '<p style="margin:24px 0 0;font-size:12px;color:#6B5D4F">R. Ramesh Arts Studio, Solapur</p>' +
     "</div>";
 
-  try {
-    const resend = new Resend(apiKey);
-    // The SDK resolves with { data, error } and only throws on transport
-    // failures, so the error field has to be checked explicitly. Missing it
-    // would report success for a mail that was never accepted, and the caller
-    // would skip its fallback — leaving the customer with no email at all.
-    const { data, error } = await resend.emails.send({
-      from,
-      to: [input.to],
-      subject: "Reset your R. Ramesh Arts Studio password",
-      text,
-      html,
-    });
-
-    if (error) {
-      console.error(
-        "Password reset email rejected by Resend:",
-        error.name,
-        error.statusCode,
-        error.message,
-        "(from: " + from + ")"
-      );
-      return false;
-    }
-
-    if (!data?.id) {
-      console.error("Password reset email returned no id; treating as failed.");
-      return false;
-    }
-
-    return true;
-  } catch (err) {
-    console.error("Password reset email failed to send:", err);
-    return false;
-  }
+  return sendMail({
+    label: "Password reset",
+    to: input.to,
+    subject: "Reset your R. Ramesh Arts Studio password",
+    text,
+    html,
+    from,
+  });
 }
