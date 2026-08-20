@@ -6,7 +6,7 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 import { generateReceiptPdf } from "@/lib/receipt";
 import { notifyOwnerOfOrder, notifyCustomerOfOrder } from "@/lib/email";
 import { validateCoupon } from "@/lib/coupons";
-import { getOrderingStatus } from "@/lib/settings";
+import { getOrderingStatus, getCodEnabled } from "@/lib/settings";
 
 type PaymentMethod = "razorpay" | "upi" | "cod";
 
@@ -56,6 +56,12 @@ export async function placeOrder(input: Input): Promise<{
 
   if (!user) return { error: "Please log in to place your order." };
   if (!input.items.length) return { error: "Your cart is empty." };
+
+  // The method arrives from the browser, so hiding the radio button is not
+  // enough on its own — a crafted request could still ask for COD.
+  if (input.paymentMethod === "cod" && !(await getCodEnabled())) {
+    return { error: "Cash on Delivery is not available right now. Please pay online or by UPI." };
+  }
 
   const ordering = await getOrderingStatus();
   if (!ordering.open) {

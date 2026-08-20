@@ -13,12 +13,13 @@ export default async function AdminPage() {
 
   const { data: settings } = await supabaseAdmin
     .from("site_settings")
-    .select("ordering_open,order_cutoff,closed_message")
+    .select("ordering_open,order_cutoff,closed_message,cod_enabled")
     .eq("id", 1)
     .maybeSingle();
   const orderingOpen = settings?.ordering_open !== false;
   const cutoff = (settings?.order_cutoff as string | null) ?? "";
   const closedMsg = (settings?.closed_message as string | null) ?? "";
+  const codEnabled = settings?.cod_enabled !== false;
 
   return (
     <section className="site-wrap py-12">
@@ -38,6 +39,16 @@ export default async function AdminPage() {
         <label className="mt-4 flex items-center gap-2 text-sm font-medium">
           <input type="checkbox" name="ordering_open" defaultChecked={orderingOpen} />
           Accept new orders
+        </label>
+
+        <label className="mt-3 flex items-start gap-2 text-sm font-medium">
+          <input type="checkbox" name="cod_enabled" defaultChecked={codEnabled} className="mt-1" />
+          <span>
+            Accept Cash on Delivery
+            <span className="block text-xs font-normal text-ink-soft">
+              Unticked, checkout offers online card/UPI and the UPI QR only. Existing COD orders are unaffected.
+            </span>
+          </span>
         </label>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <div>
