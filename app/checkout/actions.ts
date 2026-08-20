@@ -70,8 +70,8 @@ export async function placeOrder(input: Input): Promise<{
 
   const ids = input.items.map((i) => i.id);
   const [productsRes, accessoriesRes] = await Promise.all([
-    supabaseAdmin.from("products").select("id,name,price,size").in("id", ids),
-    supabaseAdmin.from("accessories").select("id,name,price").in("id", ids),
+    supabaseAdmin.from("products").select("id,name,price,image_url,size").in("id", ids),
+    supabaseAdmin.from("accessories").select("id,name,price,image_url").in("id", ids),
   ]);
   if (productsRes.error || accessoriesRes.error) return { error: "Could not load items." };
 
@@ -86,6 +86,10 @@ export async function placeOrder(input: Input): Promise<{
           name: p.size ? `${p.name} ${p.size}` : p.name,
           price: p.price as number,
           qty: i.qty,
+          // Snapshot the photo alongside name and price. Looking it up later
+          // would show the wrong picture once a product is edited, and none
+          // at all once it is deleted.
+          image_url: (p.image_url as string | null) ?? null,
         };
       }
       const a: any = accessoryMap.get(i.id);
@@ -95,6 +99,7 @@ export async function placeOrder(input: Input): Promise<{
           name: a.name as string,
           price: a.price as number,
           qty: i.qty,
+          image_url: (a.image_url as string | null) ?? null,
         };
       }
       return null;
