@@ -1,3 +1,4 @@
+import { BLUR_DATA_URL } from "@/lib/image-placeholder";
 import Link from "next/link";
 import Image from "next/image";
 import { Product, formatINR, localizedName } from "@/lib/products";
@@ -24,6 +25,8 @@ export default function ProductCard({ product }: { product: Product }) {
               fill
               sizes="(max-width:768px) 50vw, 25vw"
               className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(.2,.7,.2,1)] group-hover:scale-[1.08]"
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
             />
           ) : (
             <div className="grid h-full place-items-center">

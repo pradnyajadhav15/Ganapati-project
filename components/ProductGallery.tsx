@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import { BLUR_DATA_URL } from "@/lib/image-placeholder";
 import { useState } from "react";
 import Image from "next/image";
 import { formatINR } from "@/lib/format";
@@ -47,7 +48,9 @@ export default function ProductGallery({
           sizes="(max-width: 768px) 100vw, 50vw"
           className="object-contain p-5 transition-transform duration-500 group-hover:scale-105"
           priority
-        />
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
+            />
         <span className="pointer-events-none absolute bottom-3 right-3 grid h-8 w-8 place-items-center rounded-full bg-ink/65 text-cream opacity-0 transition group-hover:opacity-100">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" className="h-4 w-4">
             <circle cx="11" cy="11" r="7" />
@@ -71,7 +74,10 @@ export default function ProductGallery({
                 (i === idx ? "border-terracotta" : "border-line hover:border-ink-soft")
               }
             >
-              <Image src={src} alt={alt + " " + (i + 1)} fill className="object-contain p-1.5" />
+              <Image src={src} alt={alt + " " + (i + 1)} fill className="object-contain p-1.5"
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
+            />
             </button>
           ))}
         </div>
@@ -110,7 +116,10 @@ export default function ProductGallery({
           )}
           <figure onClick={(e) => e.stopPropagation()} className="flex flex-col items-center">
             <div className="relative h-[80vh] w-[92vw] max-w-3xl">
-              <Image src={current} alt={alt} fill sizes="92vw" className="object-contain" />
+              <Image src={current} alt={alt} fill sizes="92vw" className="object-contain"
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
+            />
             </div>
             {(name || price !== undefined) && (
               <figcaption className="mt-3 text-center text-white">

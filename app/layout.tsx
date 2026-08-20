@@ -1,5 +1,5 @@
 ﻿import type { Metadata } from "next";
-import { Fraunces, Mukta } from "next/font/google";
+import { Fraunces, Mukta, Martel } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import AnnouncementBar from "@/components/AnnouncementBar";
@@ -15,6 +15,16 @@ const fraunces = Fraunces({
   weight: ["400", "500", "600"],
   style: ["normal", "italic"],
   variable: "--font-fraunces",
+});
+
+// Fraunces carries no Devanagari, so Hindi and Marathi headings would fall
+// back to whatever generic serif the device happens to have. Martel is a
+// Devanagari serif, so those headings keep the same weight and feel as the
+// English ones instead of changing typeface between languages.
+const martel = Martel({
+  subsets: ["latin", "devanagari"],
+  weight: ["400", "600", "700", "800"],
+  variable: "--font-martel",
 });
 
 const mukta = Mukta({
@@ -83,7 +93,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const locale = getLocale();
   return (
     <CartProvider>
-      <html lang={locale} className={fraunces.variable + " " + mukta.variable}>
+      <html lang={locale} className={fraunces.variable + " " + martel.variable + " " + mukta.variable}>
         <body>
           {/* Without JS the scroll-reveal observer never runs, so make
               revealed content visible for no-JS clients and crawlers. */}

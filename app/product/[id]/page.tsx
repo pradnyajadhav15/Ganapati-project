@@ -13,6 +13,8 @@ import StarRating from "@/components/StarRating";
 import ReviewForm from "@/components/ReviewForm";
 import ProductGallery from "@/components/ProductGallery";
 import PreBookForm from "@/components/PreBookForm";
+import SizeScale from "@/components/SizeScale";
+import { parseHeightInches } from "@/lib/size";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +32,7 @@ export default async function ProductPage({
   const t = getDict(locale);
   const displayName = localizedName(product, locale);
   const displayDesc = localizedDescription(product, locale);
+  const heightInches = parseHeightInches(product.size);
 
   const galleryImages = [product.image_url, ...(product.image_urls ?? [])].filter(
     Boolean
@@ -140,6 +143,8 @@ export default async function ProductPage({
               {formatINR(product.price)}
             </div>
           </div>
+          {heightInches !== null && <SizeScale inches={heightInches} t={t} />}
+
           {displayDesc && (
             <p className="mb-6 max-w-md whitespace-pre-wrap text-ink-soft">{renderWithBold(displayDesc)}</p>
           )}
