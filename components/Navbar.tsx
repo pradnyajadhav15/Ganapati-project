@@ -40,7 +40,7 @@ export default async function Navbar() {
 
   return (
     <NavShell>
-      <div className="site-wrap flex h-[78px] items-center justify-between gap-2 sm:gap-4 xl:gap-6">
+      <div className="site-wrap flex h-[78px] items-center justify-between gap-2 sm:gap-4 nav:gap-6">
         {/* Brand */}
         <Link href="/" className="group flex min-w-0 items-center gap-2.5 sm:gap-3.5">
           <span className="relative grid h-[42px] w-[42px] flex-none place-items-center sm:h-[52px] sm:w-[52px]">
@@ -69,7 +69,7 @@ export default async function Navbar() {
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden items-center gap-4 whitespace-nowrap text-[0.86rem] xl:flex xl:gap-5 2xl:gap-7">
+        <div className="hidden items-center gap-4 whitespace-nowrap text-[0.86rem] nav:flex xl:gap-5 2xl:gap-7">
           <Link href="/" className="nav-link">
             {t.home}
           </Link>
@@ -111,13 +111,13 @@ export default async function Navbar() {
         <div className="flex flex-none items-center gap-2 text-[0.92rem] sm:gap-3">
           <LanguageSwitcher current={locale} />
           {user ? (
-            <Link href="/account" className="nav-link hidden xl:block">
+            <Link href="/account" className="nav-link hidden nav:block">
               {t.account}
             </Link>
           ) : (
             <Link
               href="/login"
-              className="hidden rounded-full border-[1.5px] border-ink/80 px-4 py-1.5 font-medium text-ink transition-all duration-300 hover:-translate-y-0.5 hover:border-ink hover:bg-ink hover:text-cream hover:shadow-lux xl:block"
+              className="hidden rounded-full border-[1.5px] border-ink/80 px-4 py-1.5 font-medium text-ink transition-all duration-300 hover:-translate-y-0.5 hover:border-ink hover:bg-ink hover:text-cream hover:shadow-lux nav:block"
             >
               {t.logIn}
             </Link>
