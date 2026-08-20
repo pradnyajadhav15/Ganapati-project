@@ -23,6 +23,7 @@ const collections = [
   { href: "/collections/fiber-idols", key: "fiberIdols" },
   { href: "/collections/pop-idols", key: "popIdols" },
   { href: "/collections/accessories", key: "ganpatiShastra" },
+  { href: "/materials", key: "chooseMaterial" },
 ] as const;
 
 export default async function Navbar() {

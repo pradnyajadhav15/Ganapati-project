@@ -86,6 +86,8 @@ export default function Footer() {
               [t.aboutUs, "/about"],
               [t.contactUs, "/contact"],
               [t.faq, "/faq"],
+              [t.chooseMaterial, "/materials"],
+              [t.idolCare, "/care"],
               [t.initiative, "/initiative"],
               [t.collections, "/collections/shadu-mati-idols"],
               [t.news, "/media-coverage"],

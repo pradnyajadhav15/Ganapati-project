@@ -35,3 +35,30 @@ export async function getCodEnabled(): Promise<boolean> {
     .maybeSingle();
   return data?.cod_enabled !== false;
 }
+
+/**
+ * Days remaining until the season booking cutoff, in IST so it flips over at
+ * midnight in Solapur rather than wherever the server happens to run.
+ *
+ * Returns null when no cutoff is set, when ordering is already closed, or once
+ * the date has passed — the countdown simply does not appear rather than
+ * showing a stale or negative number.
+ */
+export async function getSeasonCountdown(): Promise<{ days: number; cutoff: string } | null> {
+  const { data } = await supabaseAdmin
+    .from("site_settings")
+    .select("ordering_open,order_cutoff")
+    .eq("id", 1)
+    .maybeSingle();
+
+  if (!data || data.ordering_open === false || !data.order_cutoff) return null;
+
+  const cutoff = String(data.order_cutoff);
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+  if (today > cutoff) return null;
+
+  const ms = Date.parse(cutoff + "T00:00:00+05:30") - Date.parse(today + "T00:00:00+05:30");
+  const days = Math.round(ms / 86400000);
+  if (!Number.isFinite(days) || days < 0) return null;
+  return { days, cutoff };
+}

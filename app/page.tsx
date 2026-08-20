@@ -4,6 +4,7 @@ import Image from "next/image";
 import ProductCard from "@/components/ProductCard";
 import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/Reveal";
+import SeasonCountdown from "@/components/SeasonCountdown";
 import AccessoryGrid from "@/components/AccessoryGrid";
 import { getProducts } from "@/lib/products";
 import { getAccessories } from "@/lib/accessories";
@@ -190,6 +191,8 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      <SeasonCountdown />
 
       {/* FEATURED */}
       <section className="site-wrap py-[100px]">
