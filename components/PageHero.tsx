@@ -1,4 +1,5 @@
 import { DurvaMark } from "@/components/Botanical";
+import FlowerBackdrop from "@/components/FlowerBackdrop";
 
 export default function PageHero({
   kicker,
@@ -24,6 +25,8 @@ export default function PageHero({
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_100%_at_50%_100%,rgba(51,41,31,.16),transparent_60%)]"
       />
+      <FlowerBackdrop layout="left" />
+
       {/* fade into the page below */}
       <div
         aria-hidden="true"

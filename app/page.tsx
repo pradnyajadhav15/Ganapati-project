@@ -6,6 +6,7 @@ import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/Reveal";
 import SeasonCountdown from "@/components/SeasonCountdown";
 import { Lotus, Jaswand } from "@/components/Botanical";
+import FlowerBackdrop from "@/components/FlowerBackdrop";
 import AccessoryGrid from "@/components/AccessoryGrid";
 import { getProducts } from "@/lib/products";
 import { getAccessories } from "@/lib/accessories";
@@ -302,6 +303,7 @@ export default async function Home() {
         />
         {/* botanical wash — texture, not decoration, so it stays very faint */}
         <Lotus className="pointer-events-none absolute -left-16 bottom-4 hidden w-[420px] text-sage-deep/[0.07] md:block" />
+        <FlowerBackdrop layout="right" />
         <div className="site-wrap relative grid items-center gap-14 md:grid-cols-[0.9fr_1.1fr]">
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full border border-terracotta/25 bg-terracotta/10 px-4 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-terracotta-deep">
