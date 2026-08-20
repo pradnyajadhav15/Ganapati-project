@@ -7,6 +7,12 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        // The header menu measures ~1143px of content plus gutters, so it can
+        // appear well before xl. Sitting on xl(1280) hid it on a 1920 screen at
+        // 150% scaling, which lands near 1265 once the scrollbar is taken off.
+        nav: "1200px",
+      },
       colors: {
         cream: "#FBF6EE",
         "cream-deep": "#F4EADB",
