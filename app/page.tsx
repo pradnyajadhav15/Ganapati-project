@@ -1,4 +1,5 @@
 ﻿import Link from "next/link";
+import { BLUR_DATA_URL } from "@/lib/image-placeholder";
 import Image from "next/image";
 import ProductCard from "@/components/ProductCard";
 import SectionHeading from "@/components/SectionHeading";
@@ -126,7 +127,9 @@ export default async function Home() {
           sizes="100vw"
           className="animate-kenburns object-cover object-center"
           priority
-        />
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
+            />
         {/* layered cinematic scrims */}
         <div className="absolute inset-0 bg-black/25" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-transparent" />
@@ -319,7 +322,9 @@ export default async function Home() {
                   fill
                   sizes="(max-width: 500px) 100vw, 55vw"
                   className="object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(.2,.7,.2,1)] hover:scale-[1.04]"
-                />
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
+            />
               </div>
 
               {/* Est. medallion */}

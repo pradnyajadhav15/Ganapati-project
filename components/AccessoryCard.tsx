@@ -1,3 +1,4 @@
+import { BLUR_DATA_URL } from "@/lib/image-placeholder";
 import Link from "next/link";
 import Image from "next/image";
 import { formatINR } from "@/lib/format";
@@ -26,6 +27,8 @@ export default function AccessoryCard({ accessory }: { accessory: Accessory }) {
               fill
               sizes="(max-width:768px) 50vw, 20vw"
               className="object-contain p-5 transition-transform duration-[900ms] ease-[cubic-bezier(.2,.7,.2,1)] group-hover:scale-[1.09]"
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
             />
           ) : null}
           <div className="pointer-events-none absolute inset-0 bg-gold/0 transition-colors duration-700 group-hover:bg-gold/[0.06]" />

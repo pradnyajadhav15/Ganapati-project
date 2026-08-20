@@ -28,7 +28,8 @@ const config: Config = {
         "line-soft": "#EFE6D8",
       },
       fontFamily: {
-        display: ["var(--font-fraunces)", "serif"],
+        // Per-glyph fallback: Latin resolves to Fraunces, Devanagari to Martel.
+        display: ["var(--font-fraunces)", "var(--font-martel)", "serif"],
         body: ["var(--font-mukta)", "sans-serif"],
       },
       boxShadow: {
