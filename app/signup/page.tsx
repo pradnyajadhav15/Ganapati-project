@@ -16,7 +16,7 @@ export default function SignupPage({
   const t = getDict(getLocale());
 
   return (
-    <section className="grid min-h-[70vh] place-items-center px-6 py-16">
+    <section className="grid min-h-panel place-items-center px-6 py-16">
       <form
         action={signUp}
         className="w-full max-w-sm rounded-xl2 border border-line bg-white p-8 shadow-soft"

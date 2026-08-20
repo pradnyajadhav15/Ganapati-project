@@ -23,7 +23,7 @@ export default async function ResetPasswordPage({
 
   if (!user) {
     return (
-      <section className="grid min-h-[70vh] place-items-center px-6 py-16">
+      <section className="grid min-h-panel place-items-center px-6 py-16">
         <div className="w-full max-w-sm rounded-xl2 border border-line bg-white p-8 text-center shadow-soft">
           <h1 className="text-3xl">Link Expired</h1>
           <p className="mb-6 mt-3 text-sm leading-relaxed text-ink-soft">
@@ -45,7 +45,7 @@ export default async function ResetPasswordPage({
   }
 
   return (
-    <section className="grid min-h-[70vh] place-items-center px-6 py-16">
+    <section className="grid min-h-panel place-items-center px-6 py-16">
       <form
         action={updatePassword}
         className="w-full max-w-sm rounded-xl2 border border-line bg-white p-8 shadow-soft"

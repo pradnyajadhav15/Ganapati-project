@@ -152,7 +152,7 @@ export default async function MaterialsPage() {
 
 function Row({ label, value, emphasis }: { label: string; value: string; emphasis?: boolean }) {
   return (
-    <div className="grid grid-cols-[7.5rem_1fr] gap-3">
+    <div className="grid gap-1 sm:grid-cols-[7.5rem_1fr] sm:gap-3">
       <dt className="text-[0.72rem] uppercase tracking-[0.12em] text-ink-soft">{label}</dt>
       <dd className={emphasis ? "font-semibold text-ink" : "text-ink-soft"}>{value}</dd>
     </div>

@@ -40,14 +40,14 @@ export default async function Navbar() {
 
   return (
     <NavShell>
-      <div className="site-wrap flex h-[78px] items-center justify-between gap-6">
+      <div className="site-wrap flex h-[78px] items-center justify-between gap-2 sm:gap-4 xl:gap-6">
         {/* Brand */}
-        <Link href="/" className="group flex shrink-0 items-center gap-3.5">
-          <span className="relative grid h-[52px] w-[52px] place-items-center">
+        <Link href="/" className="group flex min-w-0 items-center gap-2.5 sm:gap-3.5">
+          <span className="relative grid h-[42px] w-[42px] flex-none place-items-center sm:h-[52px] sm:w-[52px]">
             {/* gold ring */}
             <span className="absolute inset-0 rounded-full bg-gold-sheen opacity-80 transition-opacity duration-500 group-hover:opacity-100" />
             <span className="absolute inset-[1.5px] rounded-full bg-cream" />
-            <span className="relative h-[46px] w-[46px] overflow-hidden rounded-full">
+            <span className="relative h-[37px] w-[37px] overflow-hidden rounded-full sm:h-[46px] sm:w-[46px]">
               <Image
                 src="/images/logo.png"
                 alt="R. Ramesh Arts Studio logo"
@@ -58,18 +58,18 @@ export default async function Navbar() {
               />
             </span>
           </span>
-          <span className="leading-none">
-            <b className="block font-display text-[1.08rem] font-semibold tracking-wide text-ink">
+          <span className="min-w-0 leading-none">
+            <b className="block truncate font-display text-[0.95rem] font-semibold tracking-wide text-ink sm:text-[1.08rem]">
               R. Ramesh Arts
             </b>
-            <span className="mt-1 block text-[0.6rem] uppercase tracking-[0.42em] text-gold-deep/80">
+            <span className="mt-1 hidden text-[0.6rem] uppercase tracking-[0.42em] text-gold-deep/80 sm:block">
               Studio
             </span>
           </span>
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden items-center gap-4 whitespace-nowrap text-[0.86rem] lg:flex xl:gap-6 xl:text-[0.92rem]">
+        <div className="hidden items-center gap-4 whitespace-nowrap text-[0.86rem] xl:flex xl:gap-5 2xl:gap-7">
           <Link href="/" className="nav-link">
             {t.home}
           </Link>
@@ -108,16 +108,16 @@ export default async function Navbar() {
         </div>
 
         {/* Right cluster */}
-        <div className="flex items-center gap-3 text-[0.92rem]">
+        <div className="flex flex-none items-center gap-2 text-[0.92rem] sm:gap-3">
           <LanguageSwitcher current={locale} />
           {user ? (
-            <Link href="/account" className="nav-link hidden sm:block">
+            <Link href="/account" className="nav-link hidden xl:block">
               {t.account}
             </Link>
           ) : (
             <Link
               href="/login"
-              className="hidden rounded-full border-[1.5px] border-ink/80 px-4 py-1.5 font-medium text-ink transition-all duration-300 hover:-translate-y-0.5 hover:border-ink hover:bg-ink hover:text-cream hover:shadow-lux sm:block"
+              className="hidden rounded-full border-[1.5px] border-ink/80 px-4 py-1.5 font-medium text-ink transition-all duration-300 hover:-translate-y-0.5 hover:border-ink hover:bg-ink hover:text-cream hover:shadow-lux xl:block"
             >
               {t.logIn}
             </Link>

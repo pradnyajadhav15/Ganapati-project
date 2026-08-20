@@ -120,7 +120,7 @@ export default async function Home() {
   return (
     <>
       {/* HERO */}
-      <section className="relative flex min-h-[92vh] items-center overflow-hidden">
+      <section className="relative flex min-h-hero items-center overflow-hidden">
         <Image
           src="/images/hero-idol.jpg"
           alt="Handcrafted Ganesha idol"

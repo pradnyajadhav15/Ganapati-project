@@ -11,7 +11,7 @@ export default function PageHero({
 }) {
   return (
     <section
-      className={`relative flex min-h-[46vh] items-center justify-center overflow-hidden bg-gradient-to-br ${swatch} text-center`}
+      className={`relative flex min-h-pagehero items-center justify-center overflow-hidden bg-gradient-to-br ${swatch} text-center`}
     >
       {/* luminous centre + soft vignette */}
       <div
