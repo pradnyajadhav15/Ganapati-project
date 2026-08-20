@@ -148,7 +148,29 @@ export default async function AdminOrderDetail({ params }: { params: { id: strin
               <tbody>
                 {(items ?? []).map((it) => (
                   <tr key={it.id} className="border-t border-line">
-                    <td className="p-4">{it.name}</td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="relative h-14 w-14 flex-none overflow-hidden rounded-lg border border-line bg-cream-deep">
+                          {it.image_url ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img
+                              src={it.image_url as string}
+                              alt={it.name as string}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <span
+                              className="grid h-full w-full place-items-center text-lg"
+                              title="No photo recorded for this item"
+                              aria-hidden="true"
+                            >
+                              🪔
+                            </span>
+                          )}
+                        </div>
+                        <span className="font-medium">{it.name}</span>
+                      </div>
+                    </td>
                     <td className="p-4">{it.qty}</td>
                     <td className="p-4">{formatINR(it.price as number)}</td>
                     <td className="p-4">{formatINR((it.price as number) * (it.qty as number))}</td>
