@@ -12,7 +12,7 @@ export default function LoginPage({
   searchParams: { error?: string };
 }) {
   return (
-    <section className="grid min-h-[70vh] place-items-center px-6">
+    <section className="grid min-h-panel place-items-center px-6">
       <form
         action={login}
         className="w-full max-w-sm rounded-xl2 border border-line bg-white p-8 shadow-soft"

@@ -55,7 +55,7 @@
    ============================================================ */
 @layer components {
   .site-wrap {
-    @apply mx-auto max-w-site px-7;
+    @apply mx-auto max-w-site px-4 sm:px-6 lg:px-7;
   }
 
   /* ---------- Buttons: light sweep on hover ---------- */
@@ -153,6 +153,20 @@
   .rule-gold {
     height: 1px;
     background: linear-gradient(90deg, transparent, theme("colors.gold" / 45%), transparent);
+  }
+
+  /* ---------- Viewport heights that survive iOS ----------
+     Mobile Safari counts the collapsing URL bar inside vh, so a 92vh hero is
+     taller than the screen on first paint and shifts as the bar hides. dvh
+     tracks the visible area; the vh line stays as the fallback for browsers
+     without it. */
+  .min-h-hero { min-height: 92vh; }
+  .min-h-panel { min-height: 70vh; }
+  .min-h-pagehero { min-height: 46vh; }
+  @supports (height: 100dvh) {
+    .min-h-hero { min-height: 92dvh; }
+    .min-h-panel { min-height: 70dvh; }
+    .min-h-pagehero { min-height: 46dvh; }
   }
 
   /* ---------- Underline-grow nav link ---------- */

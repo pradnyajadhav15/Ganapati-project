@@ -62,8 +62,8 @@ export default async function AdminOrderDetail({
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-xl2 border border-line bg-white">
-            <table className="w-full text-left text-sm">
+          <div className="overflow-x-auto rounded-xl2 border border-line bg-white">
+            <table className="w-full min-w-[34rem] text-left text-sm">
               <thead className="bg-cream-deep text-ink-soft">
                 <tr>
                   <th className="p-4">Item</th>

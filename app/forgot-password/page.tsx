@@ -11,7 +11,7 @@ export default function ForgotPasswordPage({
   searchParams: { sent?: string; error?: string };
 }) {
   return (
-    <section className="grid min-h-[70vh] place-items-center px-6 py-16">
+    <section className="grid min-h-panel place-items-center px-6 py-16">
       <div className="w-full max-w-sm rounded-xl2 border border-line bg-white p-8 shadow-soft">
         <h1 className="text-center text-3xl">Forgot Password</h1>
         <p className="mb-6 mt-1 text-center text-sm text-ink-soft">

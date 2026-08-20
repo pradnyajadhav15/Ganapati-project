@@ -48,7 +48,7 @@ export default async function Page() {
           </div>
           <div className="flex flex-wrap justify-center gap-x-16 gap-y-10">
             {team.map((m) => (
-              <div key={m.roleKey} className="w-[260px] text-center">
+              <div key={m.roleKey} className="w-full max-w-[260px] text-center">
                 <div className="relative mx-auto mb-4 h-[150px] w-[150px] overflow-hidden rounded-full border-4 border-white shadow-soft">
                   <Image src={m.image} alt={m.name} fill className="object-cover" />
                 </div>
